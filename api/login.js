@@ -16,16 +16,22 @@ async function checkPassword(password, SUPABASE_URL, SERVICE_KEY, ADMIN_PASSWORD
     const resp = await fetch(SUPABASE_URL + "/rest/v1/admin_auth?id=eq.main&select=pass_hash,pass_salt", {
       headers: { apikey: SERVICE_KEY, Authorization: "Bearer " + SERVICE_KEY }
     }).catch(function () { return null; });
-    if (resp && resp.ok) {
-      const rows = await resp.json().catch(function () { return []; });
-      if (rows && rows[0]) {
-        const expected = hashPassword(password, rows[0].pass_salt);
-        const a = Buffer.from(expected, "hex");
-        const b = Buffer.from(rows[0].pass_hash, "hex");
-        if (a.length !== b.length) return false;
-        return crypto.timingSafeEqual(a, b);
-      }
+    // Se Supabase non risponde o risponde con errore, non torniamo mai al fallback:
+    // altrimenti un guasto temporaneo del database riaprirebbe di nascosto il vecchio
+    // ADMIN_PASSWORD anche dopo che il proprietario l'ha cambiata dal pannello.
+    if (!resp || !resp.ok) return false;
+    const rows = await resp.json().catch(function () { return null; });
+    if (rows === null) return false;
+    if (rows[0]) {
+      const expected = hashPassword(password, rows[0].pass_salt);
+      const a = Buffer.from(expected, "hex");
+      const b = Buffer.from(rows[0].pass_hash, "hex");
+      if (a.length !== b.length) return false;
+      return crypto.timingSafeEqual(a, b);
     }
+    // Nessuna riga: la password non è mai stata cambiata dal pannello, si usa
+    // ancora ADMIN_PASSWORD come credenziale iniziale (stato "bootstrap").
+    return !!ADMIN_PASSWORD && password === ADMIN_PASSWORD;
   }
   return !!ADMIN_PASSWORD && password === ADMIN_PASSWORD;
 }
