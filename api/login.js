@@ -11,11 +11,27 @@ function hashPassword(password, salt) {
 // Legge la password attuale: se è stata cambiata dal pannello admin, vive nella
 // tabella privata admin_auth su Supabase (mai leggibile dal browser). Se non è
 // mai stata cambiata, si usa ancora la variabile d'ambiente ADMIN_PASSWORD.
+function wait(ms) { return new Promise(function (r) { setTimeout(r, ms); }); }
+
+async function fetchAdminAuthRow(SUPABASE_URL, SERVICE_KEY) {
+  var url = SUPABASE_URL + "/rest/v1/admin_auth?id=eq.main&select=pass_hash,pass_salt";
+  var opts = { headers: { apikey: SERVICE_KEY, Authorization: "Bearer " + SERVICE_KEY } };
+  // Un tentativo solo non basta: appena la tabella admin_auth viene creata, la cache
+  // dello schema di Supabase puo' impiegare qualche istante ad aggiornarsi, e in quella
+  // finestra le richieste falliscono anche se tutto e' configurato correttamente. Un
+  // singolo ritentativo dopo una breve pausa copre questo caso senza indebolire la
+  // sicurezza (un vero guasto persistente continua comunque a bloccare il login).
+  var resp = await fetch(url, opts).catch(function () { return null; });
+  if (!resp || !resp.ok) {
+    await wait(600);
+    resp = await fetch(url, opts).catch(function () { return null; });
+  }
+  return resp;
+}
+
 async function checkPassword(password, SUPABASE_URL, SERVICE_KEY, ADMIN_PASSWORD) {
   if (SUPABASE_URL && SERVICE_KEY) {
-    const resp = await fetch(SUPABASE_URL + "/rest/v1/admin_auth?id=eq.main&select=pass_hash,pass_salt", {
-      headers: { apikey: SERVICE_KEY, Authorization: "Bearer " + SERVICE_KEY }
-    }).catch(function () { return null; });
+    const resp = await fetchAdminAuthRow(SUPABASE_URL, SERVICE_KEY);
     // Se Supabase non risponde o risponde con errore, non torniamo mai al fallback:
     // altrimenti un guasto temporaneo del database riaprirebbe di nascosto il vecchio
     // ADMIN_PASSWORD anche dopo che il proprietario l'ha cambiata dal pannello.
