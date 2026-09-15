@@ -114,7 +114,7 @@
   .eyebrow::before{content:""; width:1.4em; height:1px; background:currentColor; display:inline-block;}
   .wrap{ max-width:1180px; margin-inline:auto; padding-inline:max(16px, 4vw); }
   section{ padding-block:clamp(48px,7vw,96px); }
-  button{font-family:inherit;}
+  button{font-family:inherit; color:inherit;}
   :focus-visible{ outline:2px solid var(--accent); outline-offset:2px; }
   @media (prefers-reduced-motion: reduce){ *{animation-duration:.001ms !important; transition-duration:.001ms !important;} }
 
@@ -180,7 +180,7 @@
     :root:not([data-theme="light"]) .theme-toggle .icon-moon{ display:none; }
     :root:not([data-theme="light"]) .theme-toggle .icon-sun{ display:block; }
   }
-  .menu-btn{ display:none; background:none; border:1px solid var(--border); border-radius:3px; padding:8px 10px; }
+  .menu-btn{ display:none; background:none; border:1px solid var(--border); border-radius:3px; padding:8px 10px; color:var(--fg); font-size:1.05rem; line-height:1; }
   @media (max-width:860px){
     nav.links{ display:none; }
     nav.links.open{
@@ -281,6 +281,7 @@
     border-radius:99px; padding:.28em .6em;
   }
   .cat-empty{ padding:40px 0; text-align:center; color:var(--fg-muted); display:none; }
+  .cat-loadmore-row{ display:flex; justify-content:center; margin-top:2em; }
 
   /* ---------- modal ---------- */
   .modal-backdrop{
@@ -773,6 +774,9 @@
     <p class="cat-count mono" id="cat-count">14 mezzi in catalogo</p>
     <div class="cat-grid" id="cat-grid"></div>
     <p class="cat-empty" id="cat-empty">Nessun mezzo trovato con questi filtri. Prova a reimpostarli.</p>
+    <div class="cat-loadmore-row" id="cat-loadmore-row" hidden>
+      <button type="button" class="btn btn-ghost" id="cat-loadmore">Carica altri</button>
+    </div>
   </section>
 
   <div class="modal-backdrop" id="modal-backdrop">
@@ -1447,7 +1451,8 @@
   var grid = document.getElementById("cat-grid");
   var countEl = document.getElementById("cat-count");
   var emptyEl = document.getElementById("cat-empty");
-  var state = { categoria:"tutti", marchio:"tutti", q:"" };
+  function catalogPageSize(){ return window.matchMedia("(max-width:640px)").matches ? 4 : 10; }
+  var state = { categoria:"tutti", marchio:"tutti", q:"", visible:catalogPageSize() };
 
   /* ---------- carrello richieste (nessun pagamento: solo email / whatsapp / chiamata) ---------- */
   var CART_STORAGE = "agritecnica-cart";
@@ -1537,7 +1542,8 @@
       var okQ = !q || (it.nome + " " + it.tagline).toLowerCase().indexOf(q) !== -1;
       return okCat && okBrand && okQ;
     });
-    grid.innerHTML = items.map(function(it, i){
+    var shown = items.slice(0, state.visible);
+    grid.innerHTML = shown.map(function(it, i){
       var inCart = cart.indexOf(it.id) !== -1;
       return '<button class="cat-card" data-id="'+it.id+'" style="animation-delay:'+(i*0.03)+'s">' +
         '<span class="thumb">' + cardMediaHTML(it) + '<span class="tag">'+CAT_LABEL[it.categoria]+'</span>' +
@@ -1555,8 +1561,11 @@
         '</span>' +
       '</button>';
     }).join("");
-    countEl.textContent = items.length + (items.length === 1 ? " mezzo in catalogo" : " mezzi in catalogo");
+    countEl.textContent = shown.length < items.length
+      ? shown.length + " di " + items.length + " mezzi in catalogo"
+      : items.length + (items.length === 1 ? " mezzo in catalogo" : " mezzi in catalogo");
     emptyEl.style.display = items.length ? "none" : "block";
+    document.getElementById("cat-loadmore-row").hidden = shown.length >= items.length;
   }
 
   /* ---------- testimonianze (elenco modificabile dal pannello admin) ---------- */
@@ -1586,6 +1595,7 @@
       container.querySelectorAll(".chip").forEach(function(c){ c.setAttribute("aria-pressed","false"); });
       btn.setAttribute("aria-pressed","true");
       state[key] = btn.dataset.value;
+      state.visible = catalogPageSize();
       render();
     });
   }
@@ -1594,6 +1604,12 @@
 
   document.getElementById("cat-search-input").addEventListener("input", function(e){
     state.q = e.target.value;
+    state.visible = catalogPageSize();
+    render();
+  });
+
+  document.getElementById("cat-loadmore").addEventListener("click", function(){
+    state.visible += catalogPageSize();
     render();
   });
 
