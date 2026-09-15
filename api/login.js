@@ -29,27 +29,35 @@ async function fetchAdminAuthRow(SUPABASE_URL, SERVICE_KEY) {
   return resp;
 }
 
+// Restituisce { ok, dbError, detail } invece di un semplice booleano, cosi chi chiama
+// puo' distinguere "password sbagliata" da "non sono riuscito a controllarla" (es.
+// Supabase irraggiungibile o mal configurato) e dare un messaggio utile invece di
+// un generico "credenziali non valide" che nasconderebbe un problema di configurazione.
 async function checkPassword(password, SUPABASE_URL, SERVICE_KEY, ADMIN_PASSWORD) {
   if (SUPABASE_URL && SERVICE_KEY) {
     const resp = await fetchAdminAuthRow(SUPABASE_URL, SERVICE_KEY);
     // Se Supabase non risponde o risponde con errore, non torniamo mai al fallback:
     // altrimenti un guasto temporaneo del database riaprirebbe di nascosto il vecchio
     // ADMIN_PASSWORD anche dopo che il proprietario l'ha cambiata dal pannello.
-    if (!resp || !resp.ok) return false;
+    if (!resp) return { ok: false, dbError: true, detail: "impossibile contattare Supabase" };
+    if (!resp.ok) {
+      const detail = await resp.text().catch(function () { return ""; });
+      return { ok: false, dbError: true, detail: "Supabase ha risposto " + resp.status + ": " + detail.slice(0, 200) };
+    }
     const rows = await resp.json().catch(function () { return null; });
-    if (rows === null) return false;
+    if (rows === null) return { ok: false, dbError: true, detail: "risposta di Supabase non leggibile" };
     if (rows[0]) {
       const expected = hashPassword(password, rows[0].pass_salt);
       const a = Buffer.from(expected, "hex");
       const b = Buffer.from(rows[0].pass_hash, "hex");
-      if (a.length !== b.length) return false;
-      return crypto.timingSafeEqual(a, b);
+      if (a.length !== b.length) return { ok: false, dbError: false };
+      return { ok: crypto.timingSafeEqual(a, b), dbError: false };
     }
     // Nessuna riga: la password non è mai stata cambiata dal pannello, si usa
     // ancora ADMIN_PASSWORD come credenziale iniziale (stato "bootstrap").
-    return !!ADMIN_PASSWORD && password === ADMIN_PASSWORD;
+    return { ok: !!ADMIN_PASSWORD && password === ADMIN_PASSWORD, dbError: false };
   }
-  return !!ADMIN_PASSWORD && password === ADMIN_PASSWORD;
+  return { ok: !!ADMIN_PASSWORD && password === ADMIN_PASSWORD, dbError: false };
 }
 
 module.exports = async (req, res) => {
@@ -73,8 +81,12 @@ module.exports = async (req, res) => {
     return;
   }
 
-  const ok = await checkPassword(password || "", SUPABASE_URL, SERVICE_KEY, ADMIN_PASSWORD);
-  if (!ok) {
+  const result = await checkPassword(password || "", SUPABASE_URL, SERVICE_KEY, ADMIN_PASSWORD);
+  if (!result.ok) {
+    if (result.dbError) {
+      res.status(503).json({ error: "Non riesco a controllare le credenziali in questo momento (problema nel contattare il database). Riprova tra poco.", detail: result.detail });
+      return;
+    }
     res.status(401).json({ error: "credenziali non valide" });
     return;
   }

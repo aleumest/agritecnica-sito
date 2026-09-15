@@ -49,8 +49,12 @@ module.exports = async (req, res) => {
     return;
   }
 
-  const oldOk = await login.checkPassword(oldPassword || "", SUPABASE_URL, SERVICE_KEY, ADMIN_PASSWORD);
-  if (!oldOk) {
+  const oldResult = await login.checkPassword(oldPassword || "", SUPABASE_URL, SERVICE_KEY, ADMIN_PASSWORD);
+  if (!oldResult.ok) {
+    if (oldResult.dbError) {
+      res.status(503).json({ error: "Non riesco a controllare la password attuale in questo momento (problema nel contattare il database). Riprova tra poco.", detail: oldResult.detail });
+      return;
+    }
     res.status(401).json({ error: "la password attuale non è corretta" });
     return;
   }
