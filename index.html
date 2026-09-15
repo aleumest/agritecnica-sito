@@ -386,11 +386,12 @@
 
   /* ---------- spec band ---------- */
   .band{
+    --band-photo: url("images/fb9-vigneto-grigio.jpg");
     background-color:var(--band-bg); color:var(--band-fg);
     background-image:
       linear-gradient(rgba(12,14,8,.84), rgba(12,14,8,.9)),
       repeating-linear-gradient(115deg, var(--band-line) 0 1px, transparent 1px 34px),
-      url("images/fb9-vigneto-grigio.jpg");
+      var(--band-photo);
     background-size: auto, auto, cover;
     background-position: center, center, center;
   }
@@ -451,9 +452,10 @@
 
   /* ---------- cta band ---------- */
   .cta-band{
+    --cta-photo: url("images/fb7-serra-tc5800f.jpg");
     background-image:
       linear-gradient(125deg, color-mix(in srgb, var(--band-bg) 90%, transparent), color-mix(in srgb, var(--moss-700) 85%, transparent) 78%),
-      url("images/fb7-serra-tc5800f.jpg");
+      var(--cta-photo);
     background-size: cover; background-position: center;
     color:var(--accent-contrast);
     border-radius:6px;
@@ -608,6 +610,38 @@
   .admin-item-grid{ display:grid; grid-template-columns:1fr 1fr; gap:12px; }
   @media (max-width:520px){ .admin-item-grid{ grid-template-columns:1fr; } }
   .admin-item-actions{ display:flex; justify-content:flex-end; gap:10px; }
+  .admin-lists-row{ display:grid; grid-template-columns:1fr 1fr; gap:16px; margin-bottom:24px; }
+  @media (max-width:640px){ .admin-lists-row{ grid-template-columns:1fr; } }
+  .admin-list-manager{ background:var(--surface); border:1px solid var(--border); border-radius:6px; padding:16px; }
+  .admin-list-manager h3{ font-size:.92rem; margin-bottom:10px; }
+  .admin-tag-list{ display:flex; flex-wrap:wrap; gap:6px; margin-bottom:10px; }
+  .admin-tag-list:empty{ display:none; }
+  .admin-tag{
+    display:inline-flex; align-items:center; gap:6px; background:var(--surface-2); border:1px solid var(--border);
+    border-radius:99px; padding:.3em .4em .3em .8em; font-size:.8rem;
+  }
+  .admin-tag button{
+    width:18px; height:18px; border-radius:99px; border:0; background:none; color:var(--fg-muted);
+    cursor:pointer; display:flex; align-items:center; justify-content:center; font-size:.68rem; padding:0;
+  }
+  .admin-tag button:hover{ color:var(--clay); }
+  .admin-tag-add{ display:flex; gap:8px; }
+  .admin-tag-add input{
+    flex:1; font-family:inherit; font-size:.85rem; color:var(--fg); background:var(--surface-2);
+    border:1px solid color-mix(in srgb, var(--fg) 18%, var(--border)); border-radius:3px; padding:.5em .7em;
+  }
+  .admin-image-slots{ display:flex; flex-direction:column; gap:16px; margin-top:1.2em; }
+  .admin-image-slot{
+    display:flex; gap:16px; align-items:center; background:var(--surface); border:1px solid var(--border);
+    border-radius:6px; padding:16px; flex-wrap:wrap;
+  }
+  .admin-image-slot .thumb{ width:120px; aspect-ratio:16/9; border-radius:4px; overflow:hidden; flex-shrink:0; background:var(--surface-2); }
+  .admin-image-slot .thumb img{ width:100%; height:100%; object-fit:cover; display:block; }
+  .admin-image-slot .info{ flex:1; min-width:180px; display:flex; flex-direction:column; gap:8px; }
+  .admin-image-slot .info .n{ font-family:"Big Shoulders Display"; font-weight:700; font-size:1.02rem; }
+  .admin-image-slot .actions{ display:flex; gap:8px; flex-wrap:wrap; align-items:center; }
+  .admin-image-slot input[type="file"]{ font-size:.8rem; color:var(--fg-muted); max-width:200px; }
+
   .admin-item-modal select{
     font-family:inherit; font-size:.94rem; color:var(--fg); background:var(--surface-2);
     border:1px solid var(--border); border-radius:3px; padding:.7em .8em;
@@ -692,15 +726,15 @@
     <div class="hero-grid">
       <div>
         <p class="eyebrow" id="ed-hero-eyebrow">Concessionaria &amp; officina · Velletri (RM) · dal 1950</p>
-        <h1>Trattori per chi<br>lavora la <em>terra</em>,<br>non la vetrina.</h1>
+        <h1 id="ed-hero-title">Trattori per chi<br>lavora la <em>terra</em>,<br>non la vetrina.</h1>
         <p class="lead" id="ed-hero-lead">Agritecnica Sacchetti vende, assiste e rifornisce di ricambi i trattori compatti Antonio Carraro, Kubota e Carraro Tractors, per l'agricoltura specializzata e per il settore civile, da una storica officina a Velletri.</p>
         <div class="cta-row">
-          <a class="btn btn-primary" href="#contatti">Richiedi un preventivo</a>
-          <a class="btn btn-ghost" href="#reparti">Vendita, assistenza, ricambi</a>
+          <a class="btn btn-primary" href="#contatti" id="ed-hero-cta1">Richiedi un preventivo</a>
+          <a class="btn btn-ghost" href="#reparti" id="ed-hero-cta2">Vendita, assistenza, ricambi</a>
         </div>
       </div>
       <div class="field-art">
-        <img src="images/fb6-af285b-av2105lb.jpg" alt="Due trattori Antonio Carraro AV 2.105 LB e AF 2.85 B consegnati da Agritecnica Sacchetti">
+        <img id="ed-hero-photo" src="images/fb6-af285b-av2105lb.jpg" alt="Due trattori Antonio Carraro AV 2.105 LB e AF 2.85 B consegnati da Agritecnica Sacchetti">
       </div>
     </div>
   </section>
@@ -861,7 +895,7 @@
     </div>
   </section>
 
-  <section class="band">
+  <section class="band" id="ed-band-section">
     <div class="wrap">
       <div class="stitle reveal">
         <p class="eyebrow">Chi siamo</p>
@@ -929,32 +963,11 @@
   <section class="wrap" id="social">
     <div class="stitle reveal">
       <p class="eyebrow">Dal campo</p>
-      <h2>Le ultime consegne, dalla nostra pagina Facebook.</h2>
-      <p>Un assaggio di quello che pubblichiamo ogni settimana: macchine consegnate, occasioni e appuntamenti in fiera.</p>
+      <h2 id="ed-social-title">Le ultime consegne, dalla nostra pagina Facebook.</h2>
+      <p id="ed-social-text">Un assaggio di quello che pubblichiamo ogni settimana: macchine consegnate, occasioni e appuntamenti in fiera.</p>
     </div>
-    <div class="social-strip reveal">
-      <a class="social-card" href="https://www.facebook.com/agritecnicasacchetti/photos" target="_blank" rel="noopener">
-        <img src="images/fb1-tigre3800.jpg" alt="Consegna di un Antonio Carraro Tigre 3800 a Borgo Floro (Cisterna)" loading="lazy">
-        <span class="cap">Tigre 3800 consegnato a Borgo Floro</span>
-      </a>
-      <a class="social-card" href="https://www.facebook.com/agritecnicasacchetti/photos" target="_blank" rel="noopener">
-        <img src="images/fb2-af285b.jpg" alt="Consegna di un Antonio Carraro AF 2.85 B" loading="lazy">
-        <span class="cap">AF 2.85 B, Stage 5, Power Reverse</span>
-      </a>
-      <a class="social-card" href="https://www.facebook.com/agritecnicasacchetti/photos" target="_blank" rel="noopener">
-        <img src="images/fb3-major5800.jpg" alt="Offerta Antonio Carraro Major TC 5800 F" loading="lazy">
-        <span class="cap">Major TC 5800 F, zero ore</span>
-      </a>
-      <a class="social-card" href="https://www.facebook.com/agritecnicasacchetti/photos" target="_blank" rel="noopener">
-        <img src="images/fb5-agrilazio.jpg" alt="Agritecnica ad Agrilazio Expo 2026" loading="lazy">
-        <span class="cap">Ci trovate ad Agrilazio Expo 2026</span>
-      </a>
-      <a class="social-card" href="https://www.facebook.com/agritecnicasacchetti" target="_blank" rel="noopener">
-        <img src="images/fb8-camion-carraro.jpg" alt="Bilico Antonio Carraro, il trattore più bello del mondo" loading="lazy">
-        <span class="cap">Antonio Carraro, "il trattore più bello del mondo"</span>
-      </a>
-    </div>
-    <a class="btn btn-ghost" href="https://www.facebook.com/agritecnicasacchetti" target="_blank" rel="noopener" style="margin-top:1.6em;">Seguici su Facebook</a>
+    <div class="social-strip reveal" id="social-strip"></div>
+    <a class="btn btn-ghost" href="https://www.facebook.com/agritecnicasacchetti" data-contact-href="facebook" target="_blank" rel="noopener" style="margin-top:1.6em;">Seguici su Facebook</a>
   </section>
 
   <section class="wrap">
@@ -1012,7 +1025,7 @@
   </section>
 
   <section class="wrap" id="contatti">
-    <div class="cta-band reveal">
+    <div class="cta-band reveal" id="ed-cta-section">
       <div class="sw sw-wheat" aria-hidden="true">
         <svg viewBox="0 0 100 100" fill="none" stroke="currentColor" stroke-width="1.5">
           <g stroke-linecap="round">
@@ -1058,10 +1071,10 @@
           </li>
         </ul>
         <div class="social-row">
-          <a class="social-btn" href="https://www.facebook.com/agritecnicasacchetti" target="_blank" rel="noopener" aria-label="Pagina Facebook">
+          <a class="social-btn" href="https://www.facebook.com/agritecnicasacchetti" data-contact-href="facebook" target="_blank" rel="noopener" aria-label="Pagina Facebook">
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9" stroke-linecap="butt"/><path d="M13.6 8.2c-.5-.2-1-.3-1.4-.3-1.3 0-2.1.8-2.1 2.3v1.4h2.7l-.4 2H10.1V18"/><line x1="8.3" y1="11.6" x2="10.9" y2="11.6"/></svg>
           </a>
-          <a class="social-btn" href="https://instagram.com/agritecnica_sacchetti" target="_blank" rel="noopener" aria-label="Profilo Instagram">
+          <a class="social-btn" href="https://instagram.com/agritecnica_sacchetti" data-contact-href="instagram" target="_blank" rel="noopener" aria-label="Profilo Instagram">
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><rect x="3.5" y="3.5" width="17" height="17" rx="5"/><circle cx="12" cy="12" r="4"/><circle cx="16.6" cy="7.4" r=".9" fill="currentColor" stroke="none"/></svg>
           </a>
           <a class="social-btn" href="https://wa.me/390696300092" data-contact-href="whatsapp" target="_blank" rel="noopener" aria-label="Scrivi su WhatsApp">
@@ -1125,10 +1138,10 @@
         <a href="tel:+390696300092" data-contact-href="tel" data-contact-text="telefono">06 963 0092</a>
         <a href="mailto:agritecnica@libero.it" data-contact-href="mailto" data-contact-text="email">agritecnica@libero.it</a>
         <div class="social-row" style="margin-top:12px;">
-          <a class="social-btn" href="https://www.facebook.com/agritecnicasacchetti" target="_blank" rel="noopener" aria-label="Pagina Facebook">
+          <a class="social-btn" href="https://www.facebook.com/agritecnicasacchetti" data-contact-href="facebook" target="_blank" rel="noopener" aria-label="Pagina Facebook">
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9" stroke-linecap="butt"/><path d="M13.6 8.2c-.5-.2-1-.3-1.4-.3-1.3 0-2.1.8-2.1 2.3v1.4h2.7l-.4 2H10.1V18"/><line x1="8.3" y1="11.6" x2="10.9" y2="11.6"/></svg>
           </a>
-          <a class="social-btn" href="https://instagram.com/agritecnica_sacchetti" target="_blank" rel="noopener" aria-label="Profilo Instagram">
+          <a class="social-btn" href="https://instagram.com/agritecnica_sacchetti" data-contact-href="instagram" target="_blank" rel="noopener" aria-label="Profilo Instagram">
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><rect x="3.5" y="3.5" width="17" height="17" rx="5"/><circle cx="12" cy="12" r="4"/><circle cx="16.6" cy="7.4" r=".9" fill="currentColor" stroke="none"/></svg>
           </a>
         </div>
@@ -1173,11 +1186,31 @@
       <nav class="admin-tabs">
         <button type="button" class="admin-tab" data-tab="catalogo" aria-pressed="true">Macchinari</button>
         <button type="button" class="admin-tab" data-tab="recensioni" aria-pressed="false">Recensioni</button>
+        <button type="button" class="admin-tab" data-tab="dalcampo" aria-pressed="false">Dal campo</button>
         <button type="button" class="admin-tab" data-tab="testi" aria-pressed="false">Testi del sito</button>
+        <button type="button" class="admin-tab" data-tab="immagini" aria-pressed="false">Immagini</button>
         <button type="button" class="admin-tab" data-tab="account" aria-pressed="false">Account</button>
       </nav>
 
       <section class="admin-panel" id="admin-panel-catalogo">
+        <div class="admin-lists-row">
+          <div class="admin-list-manager">
+            <h3>Marchi</h3>
+            <div class="admin-tag-list" id="admin-marchi-list"></div>
+            <div class="admin-tag-add">
+              <input type="text" id="admin-marchio-new" placeholder="Nuovo marchio">
+              <button type="button" class="btn btn-ghost" id="admin-marchio-add">+ Aggiungi</button>
+            </div>
+          </div>
+          <div class="admin-list-manager">
+            <h3>Tipi di mezzo</h3>
+            <div class="admin-tag-list" id="admin-tipi-list"></div>
+            <div class="admin-tag-add">
+              <input type="text" id="admin-tipo-new" placeholder="Nuovo tipo (es. Escavatori)">
+              <button type="button" class="btn btn-ghost" id="admin-tipo-add">+ Aggiungi</button>
+            </div>
+          </div>
+        </div>
         <div class="admin-panel-head">
           <h2>Macchinari in vendita</h2>
           <button type="button" class="btn btn-primary" id="admin-new-item">+ Aggiungi macchinario</button>
@@ -1193,6 +1226,14 @@
         <div class="admin-table" id="admin-recensioni-list"></div>
       </section>
 
+      <section class="admin-panel" id="admin-panel-dalcampo" hidden>
+        <div class="admin-panel-head">
+          <h2>Sezione "Dal campo"</h2>
+          <button type="button" class="btn btn-primary" id="admin-new-dalcampo">+ Aggiungi foto</button>
+        </div>
+        <div class="admin-table" id="admin-dalcampo-list"></div>
+      </section>
+
       <section class="admin-panel" id="admin-panel-testi" hidden>
         <div class="admin-panel-head">
           <h2>Testi del sito</h2>
@@ -1203,6 +1244,14 @@
           <button class="btn btn-primary" type="submit" form="admin-content-form">Salva testi</button>
           <span class="admin-save-msg" id="admin-save-msg" hidden>Salvato.</span>
         </div>
+      </section>
+
+      <section class="admin-panel" id="admin-panel-immagini" hidden>
+        <div class="admin-panel-head">
+          <h2>Foto del sito</h2>
+        </div>
+        <p class="form-note">Ogni foto viene ridotta e salvata nel browser: per il sito online andrà poi caricata su un vero spazio immagini.</p>
+        <div class="admin-image-slots" id="admin-image-slots"></div>
       </section>
 
       <section class="admin-panel" id="admin-panel-account" hidden>
@@ -1274,6 +1323,30 @@
       </div>
     </form>
   </div>
+
+  <div class="admin-item-modal-backdrop" id="admin-dc-backdrop">
+    <form class="admin-item-modal" id="admin-dc-form" style="max-width:520px;">
+      <h3 id="admin-dc-modal-title">Nuova foto</h3>
+      <input type="hidden" id="dc-id">
+      <div class="form-row">
+        <label for="dc-foto">Foto</label>
+        <input id="dc-foto" type="file" accept="image/*">
+        <div class="admin-photo-grid" id="dc-photo-preview"></div>
+      </div>
+      <div class="form-row">
+        <label for="dc-caption">Didascalia (mostrata sotto la foto)</label>
+        <input id="dc-caption" type="text" required placeholder="Es. Tigre 3800 consegnato a Borgo Floro">
+      </div>
+      <div class="form-row">
+        <label for="dc-alt">Testo alternativo (per l'accessibilità)</label>
+        <input id="dc-alt" type="text" placeholder="Descrizione breve della foto">
+      </div>
+      <div class="admin-item-actions">
+        <button type="button" class="btn btn-ghost" id="admin-dc-cancel">Annulla</button>
+        <button type="submit" class="btn btn-primary">Salva foto</button>
+      </div>
+    </form>
+  </div>
 </div>
 
 <script>
@@ -1292,13 +1365,18 @@
     try{ localStorage.setItem(key, JSON.stringify(value)); return true; }catch(e){ return false; }
   }
 
+  /* campi che contengono markup semplice (<br>, <em>) invece di solo testo */
+  var HTML_FIELD_IDS = ["ed-hero-title"];
+
   /* applica testi eventualmente salvati dal pannello admin, anche sul sito pubblico */
   (function applyContentOverrides(){
     var overrides = adminReadJSON(ADMIN_STORAGE_CONTENT, null);
     if(!overrides) return;
     Object.keys(overrides).forEach(function(id){
       var el = document.getElementById(id);
-      if(el) el.textContent = overrides[id];
+      if(!el) return;
+      if(HTML_FIELD_IDS.indexOf(id) !== -1) el.innerHTML = overrides[id];
+      else el.textContent = overrides[id];
     });
   })();
 
@@ -1308,7 +1386,9 @@
     telefono:"06 963 0092", telefonoIntl:"+390696300092",
     whatsapp:"+393318064469",
     email:"agritecnica@libero.it", indirizzo:"Via Ariana 21, Velletri (RM)",
-    orari:"Lun-Ven 8:00-13:00 e 15:30-19:00 · Sab 8:00-13:00"
+    orari:"Lun-Ven 8:00-13:00 e 15:30-19:00 · Sab 8:00-13:00",
+    facebook:"https://www.facebook.com/agritecnicasacchetti",
+    instagram:"https://instagram.com/agritecnica_sacchetti"
   };
   var CONTACT = (function(){
     var c = {};
@@ -1325,8 +1405,29 @@
     document.querySelectorAll('[data-contact-href="tel"]').forEach(function(el){ el.href = "tel:" + CONTACT.telefonoIntl; });
     document.querySelectorAll('[data-contact-href="whatsapp"]').forEach(function(el){ el.href = "https://wa.me/" + CONTACT.whatsapp.replace(/[^0-9]/g, ""); });
     document.querySelectorAll('[data-contact-href="mailto"]').forEach(function(el){ el.href = "mailto:" + CONTACT.email; });
+    document.querySelectorAll('[data-contact-href="facebook"]').forEach(function(el){ el.href = CONTACT.facebook; });
+    document.querySelectorAll('[data-contact-href="instagram"]').forEach(function(el){ el.href = CONTACT.instagram; });
   }
   applyContact();
+
+  /* ---------- foto principali del sito (hero + sfondi fascia), sostituibili dal pannello admin ---------- */
+  var IMAGES_STORAGE = "agritecnica-images-overrides";
+  var IMAGE_SLOTS = [
+    { key:"hero", label:"Hero (foto grande in alto)", type:"img", elId:"ed-hero-photo", defaultSrc:"images/fb6-af285b-av2105lb.jpg" },
+    { key:"band", label:'Fascia "Dal 1950 a Velletri"', type:"bgvar", elId:"ed-band-section", varName:"--band-photo", defaultSrc:"images/fb9-vigneto-grigio.jpg" },
+    { key:"cta", label:"Fascia finale di contatto", type:"bgvar", elId:"ed-cta-section", varName:"--cta-photo", defaultSrc:"images/fb7-serra-tc5800f.jpg" }
+  ];
+  var IMAGES = adminReadJSON(IMAGES_STORAGE, {});
+  function imageSrcFor(slot){ return IMAGES[slot.key] || slot.defaultSrc; }
+  function applyImages(){
+    IMAGE_SLOTS.forEach(function(slot){
+      var el = document.getElementById(slot.elId);
+      if(!el) return;
+      if(slot.type === "img"){ el.src = imageSrcFor(slot); }
+      else { el.style.setProperty(slot.varName, 'url("' + imageSrcFor(slot) + '")'); }
+    });
+  }
+  applyImages();
 
   /* ---------- tema chiaro/scuro ---------- */
   var root = document.documentElement;
@@ -1447,7 +1548,36 @@
     return thumbSVG(item);
   }
 
-  var CAT_LABEL = { trattore:"Trattore", rimorchio:"Rimorchio", attrezzo:"Attrezzatura" };
+  /* ---------- tipi e marchi del catalogo: gestibili dal pannello admin ---------- */
+  var TIPI_STORAGE = "agritecnica-tipi-overrides";
+  var TIPI_DEFAULT = [ { value:"trattore", label:"Trattori" }, { value:"rimorchio", label:"Rimorchi" }, { value:"attrezzo", label:"Attrezzature" } ];
+  var TIPI = adminReadJSON(TIPI_STORAGE, null) || TIPI_DEFAULT.slice();
+
+  var MARCHI_STORAGE = "agritecnica-marchi-overrides";
+  var MARCHI_DEFAULT = ["Antonio Carraro", "Kubota", "Carraro Tractors", "Officina"];
+  var MARCHI = adminReadJSON(MARCHI_STORAGE, null) || MARCHI_DEFAULT.slice();
+
+  var CAT_LABEL = {};
+  function rebuildCatLabel(){
+    CAT_LABEL = {};
+    TIPI.forEach(function(t){ CAT_LABEL[t.value] = t.label; });
+  }
+  rebuildCatLabel();
+  function saveTipi(){ adminWriteJSON(TIPI_STORAGE, TIPI); rebuildCatLabel(); }
+  function saveMarchi(){ adminWriteJSON(MARCHI_STORAGE, MARCHI); }
+  function slugify(label){
+    var s = label.toLowerCase().trim().normalize("NFD").replace(/[̀-ͯ]/g, "").replace(/[^a-z0-9]+/g, "-").replace(/(^-|-$)/g, "");
+    return s || ("tipo-" + Date.now().toString(36));
+  }
+
+  function renderFilterChips(){
+    var catBox = document.getElementById("filter-categoria");
+    catBox.innerHTML = '<button class="chip" data-value="tutti" aria-pressed="' + (state.categoria === "tutti") + '">Tutti</button>' +
+      TIPI.map(function(t){ return '<button class="chip" data-value="' + t.value + '" aria-pressed="' + (state.categoria === t.value) + '">' + t.label + '</button>'; }).join("");
+    var brandBox = document.getElementById("filter-marchio");
+    brandBox.innerHTML = '<button class="chip" data-value="tutti" aria-pressed="' + (state.marchio === "tutti") + '">Tutti</button>' +
+      MARCHI.map(function(m){ return '<button class="chip" data-value="' + m + '" aria-pressed="' + (state.marchio === m) + '">' + m + '</button>'; }).join("");
+  }
 
   var grid = document.getElementById("cat-grid");
   var countEl = document.getElementById("cat-count");
@@ -1588,6 +1718,31 @@
   }
   renderTestimonianze();
 
+  /* ---------- "Dal campo" (elenco foto modificabile dal pannello admin) ---------- */
+  var ADMIN_STORAGE_DALCAMPO = "agritecnica-dalcampo-overrides";
+  var DALCAMPO = [
+    { id:"dc1", foto:"images/fb1-tigre3800.jpg", alt:"Consegna di un Antonio Carraro Tigre 3800 a Borgo Floro (Cisterna)", caption:"Tigre 3800 consegnato a Borgo Floro" },
+    { id:"dc2", foto:"images/fb2-af285b.jpg", alt:"Consegna di un Antonio Carraro AF 2.85 B", caption:"AF 2.85 B, Stage 5, Power Reverse" },
+    { id:"dc3", foto:"images/fb3-major5800.jpg", alt:"Offerta Antonio Carraro Major TC 5800 F", caption:"Major TC 5800 F, zero ore" },
+    { id:"dc4", foto:"images/fb5-agrilazio.jpg", alt:"Agritecnica ad Agrilazio Expo 2026", caption:"Ci trovate ad Agrilazio Expo 2026" },
+    { id:"dc5", foto:"images/fb8-camion-carraro.jpg", alt:"Bilico Antonio Carraro, il trattore più bello del mondo", caption:'Antonio Carraro, "il trattore più bello del mondo"' }
+  ];
+  (function applyDalCampoOverride(){
+    var saved = adminReadJSON(ADMIN_STORAGE_DALCAMPO, null);
+    if(saved && saved.length) DALCAMPO = saved;
+  })();
+
+  var socialStrip = document.getElementById("social-strip");
+  function renderDalCampoPublic(){
+    socialStrip.innerHTML = DALCAMPO.map(function(d){
+      return '<a class="social-card" href="' + CONTACT.facebook + '" target="_blank" rel="noopener">' +
+        '<img src="' + d.foto + '" alt="' + d.alt + '" loading="lazy">' +
+        '<span class="cap">' + d.caption + '</span>' +
+      '</a>';
+    }).join("") || "";
+  }
+  renderDalCampoPublic();
+
   function wireChips(containerId, key){
     var container = document.getElementById(containerId);
     container.addEventListener("click", function(e){
@@ -1602,6 +1757,7 @@
   }
   wireChips("filter-categoria","categoria");
   wireChips("filter-marchio","marchio");
+  renderFilterChips();
 
   document.getElementById("cat-search-input").addEventListener("input", function(e){
     state.q = e.target.value;
@@ -1736,6 +1892,9 @@
 
   var EDITABLE_FIELDS = [
     { group:"Hero", id:"ed-hero-eyebrow", label:"Etichetta sopra al titolo" },
+    { group:"Hero", id:"ed-hero-title", label:"Titolo principale (usa <br> per andare a capo, <em>parola</em> per evidenziarla in verde)", long:true, html:true },
+    { group:"Hero", id:"ed-hero-cta1", label:"Bottone verde" },
+    { group:"Hero", id:"ed-hero-cta2", label:"Bottone secondario" },
     { group:"Marchi", id:"ed-brand1-role", label:"Antonio Carraro (descrizione)" },
     { group:"Marchi", id:"ed-brand2-role", label:"Kubota (descrizione)" },
     { group:"Marchi", id:"ed-brand3-role", label:"Carraro Tractors (descrizione)" },
@@ -1761,6 +1920,8 @@
     { group:"Perché noi", id:"ed-perche3-text", label:"Punto 3 (testo)", long:true },
     { group:"Perché noi", id:"ed-perche4-title", label:"Punto 4 (titolo)" },
     { group:"Perché noi", id:"ed-perche4-text", label:"Punto 4 (testo)", long:true },
+    { group:"Dal campo", id:"ed-social-title", label:"Titolo sezione" },
+    { group:"Dal campo", id:"ed-social-text", label:"Descrizione sezione", long:true },
     { group:"FAQ", id:"ed-faq-title", label:"Titolo sezione" },
     { group:"FAQ", id:"ed-faq1-q", label:"Domanda 1" },
     { group:"FAQ", id:"ed-faq1-a", label:"Risposta 1", long:true },
@@ -1791,7 +1952,9 @@
     { key:"whatsapp", label:"WhatsApp (formato internazionale, es. +393318064469)" },
     { key:"orari", label:"Orari di apertura" },
     { key:"email", label:"Email" },
-    { key:"indirizzo", label:"Indirizzo" }
+    { key:"indirizzo", label:"Indirizzo" },
+    { key:"facebook", label:"Link pagina Facebook" },
+    { key:"instagram", label:"Link profilo Instagram" }
   ];
 
   function buildContentForm(){
@@ -1834,7 +1997,7 @@
       fs.appendChild(legend);
       groups[groupName].forEach(function(f){
         var target = document.getElementById(f.id);
-        var current = target ? target.textContent.trim() : "";
+        var current = target ? (f.html ? target.innerHTML.trim() : target.textContent.trim()) : "";
         var row = document.createElement("div");
         row.className = "form-row";
         var label = document.createElement("label");
@@ -1844,6 +2007,7 @@
         var input = document.createElement(f.long ? "textarea" : "input");
         input.id = "field-" + f.id;
         input.dataset.targetId = f.id;
+        if(f.html) input.dataset.html = "1";
         if(f.long) input.rows = 3; else input.type = "text";
         input.value = current;
         row.appendChild(input);
@@ -1861,7 +2025,7 @@
       var id = input.dataset.targetId;
       var value = input.value;
       var target = document.getElementById(id);
-      if(target) target.textContent = value;
+      if(target){ if(input.dataset.html) target.innerHTML = value; else target.textContent = value; }
       overrides[id] = value;
     });
     adminWriteJSON(ADMIN_STORAGE_CONTENT, overrides);
@@ -2118,6 +2282,219 @@
     renderTestimonianze();
   });
 
+  /* ---------- gestione marchi e tipi (usati dai filtri e dal form macchinario) ---------- */
+  function populateItemSelects(){
+    var ms = document.getElementById("ai-marchio");
+    var prevM = ms.value;
+    ms.innerHTML = MARCHI.map(function(m){ return '<option value="' + m + '">' + m + '</option>'; }).join("");
+    if(MARCHI.indexOf(prevM) !== -1) ms.value = prevM;
+    var ts = document.getElementById("ai-categoria");
+    var prevT = ts.value;
+    ts.innerHTML = TIPI.map(function(t){ return '<option value="' + t.value + '">' + t.label + '</option>'; }).join("");
+    if(TIPI.some(function(t){ return t.value === prevT; })) ts.value = prevT;
+  }
+  populateItemSelects();
+
+  function renderAdminLists(){
+    document.getElementById("admin-marchi-list").innerHTML = MARCHI.map(function(m, i){
+      return '<span class="admin-tag">' + m + '<button type="button" data-remove-marchio="' + i + '" aria-label="Rimuovi ' + m + '">✕</button></span>';
+    }).join("");
+    document.getElementById("admin-tipi-list").innerHTML = TIPI.map(function(t, i){
+      return '<span class="admin-tag">' + t.label + '<button type="button" data-remove-tipo="' + i + '" aria-label="Rimuovi ' + t.label + '">✕</button></span>';
+    }).join("");
+  }
+
+  document.getElementById("admin-marchi-list").addEventListener("click", function(e){
+    var btn = e.target.closest("[data-remove-marchio]");
+    if(!btn) return;
+    var i = Number(btn.dataset.removeMarchio);
+    if(!confirm('Rimuovere "' + MARCHI[i] + '" dai marchi? I mezzi già salvati con questo marchio non verranno modificati.')) return;
+    MARCHI.splice(i, 1);
+    saveMarchi();
+    renderAdminLists();
+    populateItemSelects();
+    renderFilterChips();
+    render();
+  });
+  document.getElementById("admin-marchio-add").addEventListener("click", function(){
+    var input = document.getElementById("admin-marchio-new");
+    var val = input.value.trim();
+    if(!val) return;
+    if(MARCHI.indexOf(val) !== -1){ alert("Questo marchio esiste già."); return; }
+    MARCHI.push(val);
+    saveMarchi();
+    input.value = "";
+    renderAdminLists();
+    populateItemSelects();
+    renderFilterChips();
+  });
+
+  document.getElementById("admin-tipi-list").addEventListener("click", function(e){
+    var btn = e.target.closest("[data-remove-tipo]");
+    if(!btn) return;
+    var i = Number(btn.dataset.removeTipo);
+    if(!confirm('Rimuovere "' + TIPI[i].label + '" dai tipi?')) return;
+    TIPI.splice(i, 1);
+    saveTipi();
+    renderAdminLists();
+    populateItemSelects();
+    renderFilterChips();
+    render();
+  });
+  document.getElementById("admin-tipo-add").addEventListener("click", function(){
+    var input = document.getElementById("admin-tipo-new");
+    var label = input.value.trim();
+    if(!label) return;
+    var value = slugify(label);
+    if(TIPI.some(function(t){ return t.value === value; })){ alert("Questo tipo esiste già."); return; }
+    TIPI.push({ value:value, label:label });
+    saveTipi();
+    input.value = "";
+    renderAdminLists();
+    populateItemSelects();
+    renderFilterChips();
+  });
+
+  /* ---------- foto principali del sito (tab Immagini) ---------- */
+  function renderAdminImages(){
+    var box = document.getElementById("admin-image-slots");
+    box.innerHTML = IMAGE_SLOTS.map(function(slot){
+      var hasOverride = !!IMAGES[slot.key];
+      return '<div class="admin-image-slot" data-slot="' + slot.key + '">' +
+        '<span class="thumb"><img src="' + imageSrcFor(slot) + '" alt=""></span>' +
+        '<div class="info">' +
+          '<span class="n">' + slot.label + '</span>' +
+          '<div class="actions">' +
+            '<input type="file" accept="image/*" data-slot-file="' + slot.key + '">' +
+            (hasOverride ? '<button type="button" class="btn btn-ghost" data-slot-reset="' + slot.key + '">Ripristina originale</button>' : "") +
+          '</div>' +
+        '</div>' +
+      '</div>';
+    }).join("");
+  }
+  document.getElementById("admin-image-slots").addEventListener("click", function(e){
+    var resetBtn = e.target.closest("[data-slot-reset]");
+    if(resetBtn){
+      delete IMAGES[resetBtn.dataset.slotReset];
+      adminWriteJSON(IMAGES_STORAGE, IMAGES);
+      applyImages();
+      renderAdminImages();
+    }
+  });
+  document.getElementById("admin-image-slots").addEventListener("change", function(e){
+    var input = e.target.closest("[data-slot-file]");
+    if(!input || !input.files || !input.files[0]) return;
+    var key = input.dataset.slotFile;
+    resizeImageFile(input.files[0]).then(function(dataUrl){
+      IMAGES[key] = dataUrl;
+      if(!adminWriteJSON(IMAGES_STORAGE, IMAGES)){
+        alert("Spazio di salvataggio del browser esaurito: prova con una foto più leggera.");
+        return;
+      }
+      applyImages();
+      renderAdminImages();
+    }).catch(function(){
+      alert("Non sono riuscito a leggere questa immagine.");
+    });
+  });
+
+  /* ---------- "Dal campo": gestione dal pannello admin ---------- */
+  function renderAdminDalCampo(){
+    var list = document.getElementById("admin-dalcampo-list");
+    if(!DALCAMPO.length){
+      list.innerHTML = '<p style="color:var(--fg-muted); font-size:.9rem;">Nessuna foto salvata.</p>';
+      return;
+    }
+    list.innerHTML = DALCAMPO.map(function(d){
+      return '<div class="admin-row" data-id="' + d.id + '">' +
+        '<div class="admin-row-main" style="flex-direction:row; align-items:center; gap:10px;">' +
+          '<img src="' + d.foto + '" alt="" style="width:40px; height:40px; border-radius:4px; object-fit:cover; border:1px solid var(--border);">' +
+          '<span class="n">' + d.caption + '</span>' +
+        '</div>' +
+        '<div class="admin-row-actions">' +
+          '<button type="button" class="admin-icon-btn" data-action="edit" aria-label="Modifica ' + d.caption + '"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"><path d="M4 20l1-4L16 5l3 3L8 19l-4 1z" stroke-linecap="round" stroke-linejoin="round"/></svg></button>' +
+          '<button type="button" class="admin-icon-btn" data-action="delete" aria-label="Elimina ' + d.caption + '"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"><path d="M5 7h14M9 7V5h6v2M7 7l1 13h8l1-13" stroke-linecap="round" stroke-linejoin="round"/></svg></button>' +
+        '</div>' +
+      '</div>';
+    }).join("");
+  }
+
+  document.getElementById("admin-dalcampo-list").addEventListener("click", function(e){
+    var btn = e.target.closest(".admin-icon-btn");
+    if(!btn) return;
+    var row = e.target.closest(".admin-row");
+    var id = row.dataset.id;
+    var d = DALCAMPO.find(function(it){ return it.id === id; });
+    if(!d) return;
+    if(btn.dataset.action === "edit"){
+      openDcModal(d);
+    } else if(btn.dataset.action === "delete"){
+      if(confirm('Eliminare la foto "' + d.caption + '"?')){
+        DALCAMPO = DALCAMPO.filter(function(it){ return it.id !== id; });
+        adminWriteJSON(ADMIN_STORAGE_DALCAMPO, DALCAMPO);
+        renderAdminDalCampo();
+        renderDalCampoPublic();
+      }
+    }
+  });
+
+  var dcBackdrop = document.getElementById("admin-dc-backdrop");
+  var pendingDcPhoto = "";
+  document.getElementById("admin-new-dalcampo").addEventListener("click", function(){ openDcModal(null); });
+
+  function renderDcPhotoPreview(){
+    var box = document.getElementById("dc-photo-preview");
+    box.innerHTML = pendingDcPhoto
+      ? '<span class="admin-photo-thumb"><img src="' + pendingDcPhoto + '" alt=""></span>'
+      : "";
+  }
+  document.getElementById("dc-foto").addEventListener("change", function(e){
+    if(!e.target.files || !e.target.files[0]) return;
+    resizeImageFile(e.target.files[0]).then(function(dataUrl){
+      pendingDcPhoto = dataUrl;
+      renderDcPhotoPreview();
+    }).catch(function(){
+      alert("Non sono riuscito a leggere questa immagine.");
+    });
+  });
+
+  function openDcModal(d){
+    document.getElementById("admin-dc-modal-title").textContent = d ? "Modifica foto" : "Nuova foto";
+    document.getElementById("dc-id").value = d ? d.id : "";
+    document.getElementById("dc-caption").value = d ? d.caption : "";
+    document.getElementById("dc-alt").value = d ? d.alt : "";
+    pendingDcPhoto = d ? d.foto : "";
+    renderDcPhotoPreview();
+    dcBackdrop.classList.add("open");
+  }
+  function closeDcModal(){ dcBackdrop.classList.remove("open"); }
+  document.getElementById("admin-dc-cancel").addEventListener("click", closeDcModal);
+  dcBackdrop.addEventListener("click", function(e){ if(e.target === dcBackdrop) closeDcModal(); });
+
+  document.getElementById("admin-dc-form").addEventListener("submit", function(e){
+    e.preventDefault();
+    if(!pendingDcPhoto){ alert("Seleziona una foto."); return; }
+    var id = document.getElementById("dc-id").value;
+    var data = {
+      id: id || ("dc-" + Date.now().toString(36)),
+      foto: pendingDcPhoto,
+      caption: document.getElementById("dc-caption").value.trim(),
+      alt: document.getElementById("dc-alt").value.trim() || document.getElementById("dc-caption").value.trim()
+    };
+    if(id){
+      DALCAMPO = DALCAMPO.map(function(it){ return it.id === id ? data : it; });
+    } else {
+      DALCAMPO = DALCAMPO.concat([data]);
+    }
+    if(!adminWriteJSON(ADMIN_STORAGE_DALCAMPO, DALCAMPO)){
+      alert("Spazio di salvataggio del browser esaurito: prova con una foto più leggera.");
+      return;
+    }
+    closeDcModal();
+    renderAdminDalCampo();
+    renderDalCampoPublic();
+  });
+
   document.getElementById("admin-login-form").addEventListener("submit", function(e){
     e.preventDefault();
     var auth = adminGetAuth();
@@ -2158,13 +2535,16 @@
     buildContentForm();
     renderAdminCatalogo();
     renderAdminRecensioni();
+    renderAdminLists();
+    renderAdminImages();
+    renderAdminDalCampo();
   }
 
   document.querySelectorAll(".admin-tab").forEach(function(tab){
     tab.addEventListener("click", function(){
       document.querySelectorAll(".admin-tab").forEach(function(t){ t.setAttribute("aria-pressed", "false"); });
       tab.setAttribute("aria-pressed", "true");
-      ["catalogo", "recensioni", "testi", "account"].forEach(function(name){
+      ["catalogo", "recensioni", "dalcampo", "testi", "immagini", "account"].forEach(function(name){
         document.getElementById("admin-panel-" + name).hidden = (name !== tab.dataset.tab);
       });
     });
