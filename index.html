@@ -679,11 +679,11 @@
       <span class="bottom">Sacchetti · Velletri</span>
     </a>
     <nav class="links">
-      <a href="#reparti">Reparti</a>
-      <a href="#catalogo">Catalogo</a>
-      <a href="#perche">Perché noi</a>
-      <a href="#faq">FAQ</a>
-      <a href="#contatti">Contatti</a>
+      <a href="#reparti" id="ed-nav1">Reparti</a>
+      <a href="#catalogo" id="ed-nav2">Catalogo</a>
+      <a href="#perche" id="ed-nav3">Perché noi</a>
+      <a href="#faq" id="ed-nav4">FAQ</a>
+      <a href="#contatti" id="ed-nav5">Contatti</a>
     </nav>
     <div class="nav-cta">
       <button class="cart-btn" id="cart-btn" aria-label="Apri la lista richieste">
@@ -697,7 +697,7 @@
       <a class="theme-toggle" href="#admin" aria-label="Area riservata">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="5.5" y="10.5" width="13" height="9" rx="2"/><path d="M8.5 10.5V8a3.5 3.5 0 0 1 7 0v2.5"/><circle cx="12" cy="14.7" r="1.3" fill="currentColor" stroke="none"/></svg>
       </a>
-      <a class="btn btn-primary" href="#contatti">Richiedi preventivo</a>
+      <a class="btn btn-primary" href="#contatti" id="ed-nav-cta">Richiedi preventivo</a>
       <button class="menu-btn" aria-label="Apri menu">☰</button>
     </div>
   </div>
@@ -741,18 +741,18 @@
 
   <section class="brand-strip">
     <div class="wrap">
-      <p class="eyebrow">Marchi rappresentati</p>
+      <p class="eyebrow" id="ed-brand-eyebrow">Marchi rappresentati</p>
       <div class="brand-row" style="margin-top:1.1em;">
         <div class="brand-plate">
-          <span class="name">Antonio Carraro</span>
+          <span class="name" id="ed-brand1-name">Antonio Carraro</span>
           <span class="role" id="ed-brand1-role">Trattori specializzati per vigneto, frutteto e pendenza</span>
         </div>
         <div class="brand-plate">
-          <span class="name">Kubota</span>
+          <span class="name" id="ed-brand2-name">Kubota</span>
           <span class="role" id="ed-brand2-role">Gamme di macchine agricole ad alta capacità di lavoro</span>
         </div>
         <div class="brand-plate">
-          <span class="name">Carraro Tractors</span>
+          <span class="name" id="ed-brand3-name">Carraro Tractors</span>
           <span class="role" id="ed-brand3-role">Cura del dettaglio e sicurezza in ogni componente</span>
         </div>
       </div>
@@ -774,14 +774,14 @@
       </svg>
     </div>
     <div class="stitle reveal">
-      <p class="eyebrow">Catalogo</p>
+      <p class="eyebrow" id="ed-cat-eyebrow">Catalogo</p>
       <h2 id="ed-cat-title">Trattori, rimorchi e attrezzature.</h2>
       <p id="ed-cat-text">Il parco macchine che teniamo in showroom e su ordinazione. Filtra per marchio o per tipo, o cerca per nome: ogni scheda apre le specifiche complete.</p>
     </div>
 
     <div class="cat-toolbar reveal">
       <div class="chip-group">
-        <span class="label">Tipo</span>
+        <span class="label" id="ed-filter-tipo-label">Tipo</span>
         <div class="chips" id="filter-categoria">
           <button class="chip" data-value="tutti" aria-pressed="true">Tutti</button>
           <button class="chip" data-value="trattore" aria-pressed="false">Trattori</button>
@@ -790,7 +790,7 @@
         </div>
       </div>
       <div class="chip-group">
-        <span class="label">Marchio</span>
+        <span class="label" id="ed-filter-marchio-label">Marchio</span>
         <div class="chips" id="filter-marchio">
           <button class="chip" data-value="tutti" aria-pressed="true">Tutti</button>
           <button class="chip" data-value="Antonio Carraro" aria-pressed="false">Antonio Carraro</button>
@@ -869,7 +869,7 @@
       </svg>
     </div>
     <div class="stitle reveal">
-      <p class="eyebrow">Cosa facciamo</p>
+      <p class="eyebrow" id="ed-reparti-eyebrow">Cosa facciamo</p>
       <h2 id="ed-reparti-title">Tre reparti, un solo referente.</h2>
       <p id="ed-reparti-text">Dalla scelta del trattore giusto alla manutenzione che lo tiene in campo per vent'anni: seguiamo il cliente prima, durante e dopo l'acquisto.</p>
     </div>
@@ -898,15 +898,15 @@
   <section class="band" id="ed-band-section">
     <div class="wrap">
       <div class="stitle reveal">
-        <p class="eyebrow">Chi siamo</p>
+        <p class="eyebrow" id="ed-chisiamo-eyebrow">Chi siamo</p>
         <h2 id="ed-chisiamo-title">Dal 1950 a Velletri, non un rivenditore qualunque.</h2>
         <p id="ed-chisiamo-text">Agritecnica Sacchetti vende e assiste macchine e attrezzature agricole dal 1950, in Via Ariana a Velletri, in provincia di Roma: leader nella vendita di trattori compatti per l'agricoltura specializzata e per il settore civile.</p>
       </div>
       <div class="spec-grid mono reveal">
-        <div class="spec"><div class="k">Attivi dal</div><div class="v">1950</div></div>
-        <div class="spec"><div class="k">Sede</div><div class="v">Velletri · RM</div></div>
-        <div class="spec"><div class="k">Marchi</div><div class="v">3</div></div>
-        <div class="spec"><div class="k">Settori</div><div class="v">Agricolo · Civile</div></div>
+        <div class="spec"><div class="k" id="ed-stat1-k">Attivi dal</div><div class="v" id="ed-stat1-v">1950</div></div>
+        <div class="spec"><div class="k" id="ed-stat2-k">Sede</div><div class="v" id="ed-stat2-v">Velletri · RM</div></div>
+        <div class="spec"><div class="k" id="ed-stat3-k">Marchi</div><div class="v" id="ed-stat3-v">3</div></div>
+        <div class="spec"><div class="k" id="ed-stat4-k">Settori</div><div class="v" id="ed-stat4-v">Agricolo · Civile</div></div>
       </div>
     </div>
   </section>
@@ -962,12 +962,12 @@
 
   <section class="wrap" id="social">
     <div class="stitle reveal">
-      <p class="eyebrow">Dal campo</p>
+      <p class="eyebrow" id="ed-social-eyebrow">Dal campo</p>
       <h2 id="ed-social-title">Le ultime consegne, dalla nostra pagina Facebook.</h2>
       <p id="ed-social-text">Un assaggio di quello che pubblichiamo ogni settimana: macchine consegnate, occasioni e appuntamenti in fiera.</p>
     </div>
     <div class="social-strip reveal" id="social-strip"></div>
-    <a class="btn btn-ghost" href="https://www.facebook.com/agritecnicasacchetti" data-contact-href="facebook" target="_blank" rel="noopener" style="margin-top:1.6em;">Seguici su Facebook</a>
+    <a class="btn btn-ghost" href="https://www.facebook.com/agritecnicasacchetti" data-contact-href="facebook" target="_blank" rel="noopener" style="margin-top:1.6em;" id="ed-social-cta">Seguici su Facebook</a>
   </section>
 
   <section class="wrap">
@@ -987,8 +987,8 @@
       </svg>
     </div>
     <div class="stitle reveal">
-      <p class="eyebrow">Testimonianze</p>
-      <h2>Chi lavora con noi lo racconta meglio di noi.</h2>
+      <p class="eyebrow" id="ed-testi-eyebrow">Testimonianze</p>
+      <h2 id="ed-testi-title">Chi lavora con noi lo racconta meglio di noi.</h2>
     </div>
     <div class="quote-row reveal" id="quote-grid"></div>
   </section>
@@ -1001,7 +1001,7 @@
       </svg>
     </div>
     <div class="stitle">
-      <p class="eyebrow">Domande frequenti</p>
+      <p class="eyebrow" id="ed-faq-eyebrow">Domande frequenti</p>
       <h2 id="ed-faq-title">Prima di chiamare.</h2>
     </div>
     <div style="margin-top:1.6em;">
@@ -1036,14 +1036,14 @@
         </svg>
       </div>
       <div>
-        <p class="eyebrow" style="color:#dfe6d4;">Parliamone</p>
+        <p class="eyebrow" style="color:#dfe6d4;" id="ed-cta-eyebrow">Parliamone</p>
         <h2 id="ed-cta-title">Hai un trattore da scegliere o un'urgenza in officina?</h2>
         <p id="ed-cta-text">Raccontaci il terreno, il lavoro da fare o il problema in corso: ti rispondiamo con la soluzione più adatta.</p>
       </div>
       <div>
         <div class="cta-row">
-          <a class="btn btn-primary" href="tel:+390696300092" data-contact-href="tel">Chiama l'officina</a>
-          <a class="btn btn-ghost" href="https://wa.me/390696300092" data-contact-href="whatsapp" target="_blank" rel="noopener">WhatsApp</a>
+          <a class="btn btn-primary" href="tel:+390696300092" data-contact-href="tel" id="ed-cta-btn1">Chiama l'officina</a>
+          <a class="btn btn-ghost" href="https://wa.me/390696300092" data-contact-href="whatsapp" target="_blank" rel="noopener" id="ed-cta-btn2">WhatsApp</a>
         </div>
         <p class="placeholder-note" style="color:#dfe6d4;"><span data-contact-text="telefono">06 963 0092</span> · <span data-contact-text="email">agritecnica@libero.it</span></p>
       </div>
@@ -1051,7 +1051,7 @@
 
     <div class="contact-grid reveal">
       <div class="contact-info">
-        <h3>Dove siamo</h3>
+        <h3 id="ed-contatti-title">Dove siamo</h3>
         <ul class="info-list">
           <li>
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"><path d="M12 21s7-7.2 7-12a7 7 0 1 0-14 0c0 4.8 7 12 7 12z"/><circle cx="12" cy="9" r="2.4"/></svg>
@@ -1085,22 +1085,22 @@
 
       <form class="contact-form" id="contact-form">
         <div class="form-row">
-          <label for="cf-nome">Nome e cognome</label>
+          <label for="cf-nome" id="ed-form-l1">Nome e cognome</label>
           <input id="cf-nome" name="nome" type="text" required autocomplete="name">
         </div>
         <div class="form-row">
-          <label for="cf-email">Email</label>
+          <label for="cf-email" id="ed-form-l2">Email</label>
           <input id="cf-email" name="email" type="email" required autocomplete="email">
         </div>
         <div class="form-row">
-          <label for="cf-telefono">Telefono (facoltativo)</label>
+          <label for="cf-telefono" id="ed-form-l3">Telefono (facoltativo)</label>
           <input id="cf-telefono" name="telefono" type="tel" autocomplete="tel">
         </div>
         <div class="form-row">
-          <label for="cf-messaggio">Cosa ti serve</label>
+          <label for="cf-messaggio" id="ed-form-l4">Cosa ti serve</label>
           <textarea id="cf-messaggio" name="messaggio" rows="4" required placeholder="Es. cerco un trattore per un vigneto in pendenza, oppure ho un guasto urgente su un Kubota"></textarea>
         </div>
-        <button class="btn btn-primary" type="submit">Invia richiesta</button>
+        <button class="btn btn-primary" type="submit" id="ed-form-submit">Invia richiesta</button>
         <p class="form-note">Il modulo apre il tuo programma di posta con il messaggio già pronto per <span data-contact-text="email">agritecnica@libero.it</span>.</p>
       </form>
     </div>
@@ -1121,19 +1121,19 @@
         <p id="ed-footer-tagline" style="color:var(--fg-muted); font-size:.85rem; margin-top:10px;">Vendita, assistenza e ricambi per trattori compatti, per l'agricoltura specializzata e il settore civile.</p>
       </div>
       <div class="foot-col">
-        <h4>Reparti</h4>
-        <a href="#reparti">Vendita</a>
-        <a href="#reparti">Assistenza tecnica</a>
-        <a href="#reparti">Ricambi</a>
+        <h4 id="ed-foot-h1">Reparti</h4>
+        <a href="#reparti" id="ed-foot-l1">Vendita</a>
+        <a href="#reparti" id="ed-foot-l2">Assistenza tecnica</a>
+        <a href="#reparti" id="ed-foot-l3">Ricambi</a>
       </div>
       <div class="foot-col">
-        <h4>Azienda</h4>
-        <a href="#catalogo">Catalogo</a>
-        <a href="#perche">Perché noi</a>
-        <a href="#faq">FAQ</a>
+        <h4 id="ed-foot-h2">Azienda</h4>
+        <a href="#catalogo" id="ed-foot-l4">Catalogo</a>
+        <a href="#perche" id="ed-foot-l5">Perché noi</a>
+        <a href="#faq" id="ed-foot-l6">FAQ</a>
       </div>
       <div class="foot-col">
-        <h4>Contatti</h4>
+        <h4 id="ed-foot-h3">Contatti</h4>
         <span data-contact-text="indirizzo" style="display:block; font-size:.9rem; padding-block:3px;">Via Ariana 21, Velletri (RM)</span>
         <a href="tel:+390696300092" data-contact-href="tel" data-contact-text="telefono">06 963 0092</a>
         <a href="mailto:agritecnica@libero.it" data-contact-href="mailto" data-contact-text="email">agritecnica@libero.it</a>
@@ -1148,9 +1148,9 @@
       </div>
     </div>
     <div class="foot-bottom">
-      <span>© 2026 Agritecnica di Sacchetti Carlo e Fabio S.n.c. · dal 1950</span>
+      <span id="ed-copyright">© 2026 Agritecnica di Sacchetti Carlo e Fabio S.n.c. · dal 1950</span>
       <span data-contact-text="orari">Lun-Ven 8:00-13:00 e 15:30-19:00 · Sab 8:00-13:00</span>
-      <span>Sito realizzato da GAMA</span>
+      <span id="ed-credit">Sito realizzato da GAMA</span>
     </div>
   </div>
 </footer>
@@ -1964,7 +1964,56 @@
     { group:"FAQ", id:"ed-faq4-a", label:"Risposta 4", long:true },
     { group:"Richiesta preventivo", id:"ed-cta-title", label:"Titolo" },
     { group:"Richiesta preventivo", id:"ed-cta-text", label:"Testo", long:true },
-    { group:"Footer", id:"ed-footer-tagline", label:"Frase sotto al logo", long:true }
+    { group:"Footer", id:"ed-footer-tagline", label:"Frase sotto al logo", long:true },
+    { group:"Navigazione", id:"ed-nav1", label:"Link 1" },
+    { group:"Navigazione", id:"ed-nav2", label:"Link 2" },
+    { group:"Navigazione", id:"ed-nav3", label:"Link 3" },
+    { group:"Navigazione", id:"ed-nav4", label:"Link 4" },
+    { group:"Navigazione", id:"ed-nav5", label:"Link 5" },
+    { group:"Navigazione", id:"ed-nav-cta", label:"Bottone \"Richiedi preventivo\"" },
+    { group:"Marchi", id:"ed-brand-eyebrow", label:"Etichetta sopra ai marchi" },
+    { group:"Marchi", id:"ed-brand1-name", label:"Nome marchio 1" },
+    { group:"Marchi", id:"ed-brand2-name", label:"Nome marchio 2" },
+    { group:"Marchi", id:"ed-brand3-name", label:"Nome marchio 3" },
+    { group:"Reparti", id:"ed-reparti-eyebrow", label:"Etichetta sopra al titolo" },
+    { group:"Catalogo", id:"ed-cat-eyebrow", label:"Etichetta sopra al titolo" },
+    { group:"Catalogo", id:"ed-filter-tipo-label", label:"Etichetta filtro \"Tipo\"" },
+    { group:"Catalogo", id:"ed-filter-marchio-label", label:"Etichetta filtro \"Marchio\"" },
+    { group:"Catalogo", id:"cat-loadmore", label:"Bottone \"Carica altri\"" },
+    { group:"Chi siamo", id:"ed-chisiamo-eyebrow", label:"Etichetta sopra al titolo" },
+    { group:"Chi siamo", id:"ed-stat1-k", label:"Statistica 1 - etichetta" },
+    { group:"Chi siamo", id:"ed-stat1-v", label:"Statistica 1 - valore" },
+    { group:"Chi siamo", id:"ed-stat2-k", label:"Statistica 2 - etichetta" },
+    { group:"Chi siamo", id:"ed-stat2-v", label:"Statistica 2 - valore" },
+    { group:"Chi siamo", id:"ed-stat3-k", label:"Statistica 3 - etichetta" },
+    { group:"Chi siamo", id:"ed-stat3-v", label:"Statistica 3 - valore" },
+    { group:"Chi siamo", id:"ed-stat4-k", label:"Statistica 4 - etichetta" },
+    { group:"Chi siamo", id:"ed-stat4-v", label:"Statistica 4 - valore" },
+    { group:"Dal campo", id:"ed-social-eyebrow", label:"Etichetta sopra al titolo" },
+    { group:"Dal campo", id:"ed-social-cta", label:"Bottone \"Seguici su Facebook\"" },
+    { group:"Testimonianze", id:"ed-testi-eyebrow", label:"Etichetta sopra al titolo" },
+    { group:"Testimonianze", id:"ed-testi-title", label:"Titolo sezione" },
+    { group:"FAQ", id:"ed-faq-eyebrow", label:"Etichetta sopra al titolo" },
+    { group:"Richiesta preventivo", id:"ed-cta-eyebrow", label:"Etichetta sopra al titolo" },
+    { group:"Richiesta preventivo", id:"ed-cta-btn1", label:"Bottone \"Chiama l'officina\"" },
+    { group:"Richiesta preventivo", id:"ed-cta-btn2", label:"Bottone \"WhatsApp\"" },
+    { group:"Richiesta preventivo", id:"ed-form-l1", label:"Campo modulo - Nome e cognome" },
+    { group:"Richiesta preventivo", id:"ed-form-l2", label:"Campo modulo - Email" },
+    { group:"Richiesta preventivo", id:"ed-form-l3", label:"Campo modulo - Telefono" },
+    { group:"Richiesta preventivo", id:"ed-form-l4", label:"Campo modulo - Cosa ti serve" },
+    { group:"Richiesta preventivo", id:"ed-form-submit", label:"Bottone invio modulo" },
+    { group:"Contatti", id:"ed-contatti-title", label:"Titolo \"Dove siamo\"" },
+    { group:"Footer", id:"ed-foot-h1", label:"Colonna 1 - titolo" },
+    { group:"Footer", id:"ed-foot-l1", label:"Colonna 1 - link 1" },
+    { group:"Footer", id:"ed-foot-l2", label:"Colonna 1 - link 2" },
+    { group:"Footer", id:"ed-foot-l3", label:"Colonna 1 - link 3" },
+    { group:"Footer", id:"ed-foot-h2", label:"Colonna 2 - titolo" },
+    { group:"Footer", id:"ed-foot-l4", label:"Colonna 2 - link 1" },
+    { group:"Footer", id:"ed-foot-l5", label:"Colonna 2 - link 2" },
+    { group:"Footer", id:"ed-foot-l6", label:"Colonna 2 - link 3" },
+    { group:"Footer", id:"ed-foot-h3", label:"Colonna 3 - titolo" },
+    { group:"Footer", id:"ed-copyright", label:"Copyright" },
+    { group:"Footer", id:"ed-credit", label:"Credito \"Sito realizzato da\"" }
   ];
 
   function adminIsLoggedIn(){
