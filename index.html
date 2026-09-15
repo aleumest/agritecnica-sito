@@ -112,7 +112,7 @@
     display:flex; align-items:center; gap:.55em;
   }
   .eyebrow::before{content:""; width:1.4em; height:1px; background:currentColor; display:inline-block;}
-  .wrap{ max-width:1180px; margin-inline:auto; padding-inline:max(16px, 4vw); }
+  .wrap{ max-width:1400px; margin-inline:auto; padding-inline:max(24px, 5vw); }
   section{ padding-block:clamp(48px,7vw,96px); }
   button{font-family:inherit; color:inherit;}
   :focus-visible{ outline:2px solid var(--accent); outline-offset:2px; }
@@ -742,20 +742,7 @@
   <section class="brand-strip">
     <div class="wrap">
       <p class="eyebrow" id="ed-brand-eyebrow">Marchi rappresentati</p>
-      <div class="brand-row" style="margin-top:1.1em;">
-        <div class="brand-plate">
-          <span class="name" id="ed-brand1-name">Antonio Carraro</span>
-          <span class="role" id="ed-brand1-role">Trattori specializzati per vigneto, frutteto e pendenza</span>
-        </div>
-        <div class="brand-plate">
-          <span class="name" id="ed-brand2-name">Kubota</span>
-          <span class="role" id="ed-brand2-role">Gamme di macchine agricole ad alta capacità di lavoro</span>
-        </div>
-        <div class="brand-plate">
-          <span class="name" id="ed-brand3-name">Carraro Tractors</span>
-          <span class="role" id="ed-brand3-role">Cura del dettaglio e sicurezza in ogni componente</span>
-        </div>
-      </div>
+      <div class="brand-row" id="brand-row" style="margin-top:1.1em;"></div>
     </div>
   </section>
 
@@ -1160,6 +1147,7 @@
     <header class="admin-topbar">
       <div class="admin-brand">Pannello Agritecnica</div>
       <div class="admin-topbar-actions">
+        <button class="btn btn-primary" id="admin-save-exit" hidden>Salva ed esci</button>
         <a class="btn btn-ghost" href="#top">Vedi il sito</a>
         <button class="btn btn-ghost" id="admin-logout" hidden>Esci</button>
       </div>
@@ -1234,6 +1222,15 @@
         <div class="admin-panel-head">
           <h2>Testi del sito</h2>
           <button type="button" class="btn btn-ghost" id="admin-reset-testi">Ripristina testi predefiniti</button>
+        </div>
+        <div class="admin-list-manager" style="margin-bottom:24px;">
+          <h3>Marchi rappresentati (home)</h3>
+          <div class="admin-tag-list" id="admin-brands-list"></div>
+          <div class="admin-tag-add" style="flex-wrap:wrap;">
+            <input type="text" id="admin-brand-name-new" placeholder="Nome marchio">
+            <input type="text" id="admin-brand-role-new" placeholder="Descrizione breve">
+            <button type="button" class="btn btn-ghost" id="admin-brand-add">+ Aggiungi</button>
+          </div>
         </div>
         <form class="admin-content-form" id="admin-content-form"></form>
         <div class="admin-save-row">
@@ -1583,6 +1580,19 @@
   var MARCHI_DEFAULT = ["Antonio Carraro", "Kubota", "Carraro Tractors", "Officina"];
   var MARCHI = remoteGet("marchi", null) || MARCHI_DEFAULT.slice();
 
+  var BRANDS_DEFAULT = [
+    { name:"Antonio Carraro", role:"Trattori specializzati per vigneto, frutteto e pendenza" },
+    { name:"Kubota", role:"Gamme di macchine agricole ad alta capacità di lavoro" },
+    { name:"Carraro Tractors", role:"Cura del dettaglio e sicurezza in ogni componente" }
+  ];
+  var BRANDS = remoteGet("brands", null) || BRANDS_DEFAULT.slice();
+  async function saveBrands(){ return await remoteSave("brands", BRANDS); }
+  function renderBrands(){
+    document.getElementById("brand-row").innerHTML = BRANDS.map(function(b){
+      return '<div class="brand-plate"><span class="name">' + b.name + '</span><span class="role">' + b.role + '</span></div>';
+    }).join("");
+  }
+
   var CAT_LABEL = {};
   function rebuildCatLabel(){
     CAT_LABEL = {};
@@ -1872,6 +1882,7 @@
   document.addEventListener("keydown", function(e){ if(e.key === "Escape" && backdrop.classList.contains("open")) closeModal(); });
 
   render();
+  renderBrands();
 
   /* ---------- form contatti: apre il client email con il messaggio pronto ---------- */
   var contactForm = document.getElementById("contact-form");
@@ -1921,9 +1932,6 @@
     { group:"Hero", id:"ed-hero-title", label:"Titolo principale (usa <br> per andare a capo, <em>parola</em> per evidenziarla in verde)", long:true, html:true },
     { group:"Hero", id:"ed-hero-cta1", label:"Bottone verde" },
     { group:"Hero", id:"ed-hero-cta2", label:"Bottone secondario" },
-    { group:"Marchi", id:"ed-brand1-role", label:"Antonio Carraro (descrizione)" },
-    { group:"Marchi", id:"ed-brand2-role", label:"Kubota (descrizione)" },
-    { group:"Marchi", id:"ed-brand3-role", label:"Carraro Tractors (descrizione)" },
     { group:"Hero", id:"ed-hero-lead", label:"Testo introduttivo", long:true },
     { group:"Reparti", id:"ed-reparti-title", label:"Titolo sezione" },
     { group:"Reparti", id:"ed-reparti-text", label:"Descrizione sezione", long:true },
@@ -1972,9 +1980,6 @@
     { group:"Navigazione", id:"ed-nav5", label:"Link 5" },
     { group:"Navigazione", id:"ed-nav-cta", label:"Bottone \"Richiedi preventivo\"" },
     { group:"Marchi", id:"ed-brand-eyebrow", label:"Etichetta sopra ai marchi" },
-    { group:"Marchi", id:"ed-brand1-name", label:"Nome marchio 1" },
-    { group:"Marchi", id:"ed-brand2-name", label:"Nome marchio 2" },
-    { group:"Marchi", id:"ed-brand3-name", label:"Nome marchio 3" },
     { group:"Reparti", id:"ed-reparti-eyebrow", label:"Etichetta sopra al titolo" },
     { group:"Catalogo", id:"ed-cat-eyebrow", label:"Etichetta sopra al titolo" },
     { group:"Catalogo", id:"ed-filter-tipo-label", label:"Etichetta filtro \"Tipo\"" },
@@ -2097,26 +2102,27 @@
     });
   }
 
-  document.getElementById("admin-content-form").addEventListener("submit", async function(e){
-    e.preventDefault();
+  async function saveTesti(){
+    var form = document.getElementById("admin-content-form");
     var msg = document.getElementById("admin-save-msg");
     var submitBtn = document.querySelector('#admin-save-row button[type="submit"], .admin-save-row button[type="submit"]');
     if(submitBtn) submitBtn.disabled = true;
     var overrides = remoteGet("content", {});
     var newOverrides = {};
     for(var k in overrides) newOverrides[k] = overrides[k];
-    var inputs = this.querySelectorAll("[data-target-id]");
+    var inputs = form.querySelectorAll("[data-target-id]");
     inputs.forEach(function(input){
       newOverrides[input.dataset.targetId] = input.value;
     });
     var newContact = {};
     for(var k2 in CONTACT) newContact[k2] = CONTACT[k2];
-    this.querySelectorAll("[data-contact-key]").forEach(function(input){
+    form.querySelectorAll("[data-contact-key]").forEach(function(input){
       newContact[input.dataset.contactKey] = input.value.trim();
     });
     var ok1 = await remoteSave("content", newOverrides);
     var ok2 = await remoteSave("contatti", newContact);
-    if(ok1 && ok2){
+    var ok = ok1 && ok2;
+    if(ok){
       inputs.forEach(function(input){
         var id = input.dataset.targetId;
         var target = document.getElementById(id);
@@ -2124,13 +2130,21 @@
       });
       CONTACT = newContact;
       applyContact();
-      msg.textContent = "Salvato.";
-      msg.hidden = false;
-      setTimeout(function(){ msg.hidden = true; }, 2500);
+      if(msg){
+        msg.textContent = "Salvato.";
+        msg.hidden = false;
+        setTimeout(function(){ msg.hidden = true; }, 2500);
+      }
     } else {
       alert("Non sono riuscito a salvare: controlla la connessione e riprova.");
     }
     if(submitBtn) submitBtn.disabled = false;
+    return ok;
+  }
+
+  document.getElementById("admin-content-form").addEventListener("submit", function(e){
+    e.preventDefault();
+    saveTesti();
   });
 
   document.getElementById("admin-reset-testi").addEventListener("click", async function(){
@@ -2414,6 +2428,9 @@
     document.getElementById("admin-tipi-list").innerHTML = TIPI.map(function(t, i){
       return '<span class="admin-tag">' + t.label + '<button type="button" data-remove-tipo="' + i + '" aria-label="Rimuovi ' + t.label + '">✕</button></span>';
     }).join("");
+    document.getElementById("admin-brands-list").innerHTML = BRANDS.map(function(b, i){
+      return '<span class="admin-tag">' + b.name + ' — ' + b.role + '<button type="button" data-remove-brand="' + i + '" aria-label="Rimuovi ' + b.name + '">✕</button></span>';
+    }).join("");
   }
 
   document.getElementById("admin-marchi-list").addEventListener("click", async function(e){
@@ -2439,6 +2456,30 @@
     renderAdminLists();
     populateItemSelects();
     renderFilterChips();
+  });
+
+  document.getElementById("admin-brands-list").addEventListener("click", async function(e){
+    var btn = e.target.closest("[data-remove-brand]");
+    if(!btn) return;
+    var i = Number(btn.dataset.removeBrand);
+    if(!confirm('Rimuovere "' + BRANDS[i].name + '" dai marchi rappresentati?')) return;
+    var removed = BRANDS.splice(i, 1)[0];
+    if(!(await saveBrands())){ BRANDS.splice(i, 0, removed); alert("Non sono riuscito a salvare: controlla la connessione e riprova."); return; }
+    renderAdminLists();
+    renderBrands();
+  });
+  document.getElementById("admin-brand-add").addEventListener("click", async function(){
+    var nameInput = document.getElementById("admin-brand-name-new");
+    var roleInput = document.getElementById("admin-brand-role-new");
+    var name = nameInput.value.trim();
+    var role = roleInput.value.trim();
+    if(!name) return;
+    BRANDS.push({ name:name, role:role });
+    if(!(await saveBrands())){ BRANDS.pop(); alert("Non sono riuscito a salvare: controlla la connessione e riprova."); return; }
+    nameInput.value = "";
+    roleInput.value = "";
+    renderAdminLists();
+    renderBrands();
   });
 
   document.getElementById("admin-tipi-list").addEventListener("click", async function(e){
@@ -2651,10 +2692,21 @@
     location.hash = "#top";
   });
 
+  document.getElementById("admin-save-exit").addEventListener("click", async function(){
+    var btn = this;
+    btn.disabled = true;
+    btn.textContent = "Salvataggio…";
+    var ok = await saveTesti();
+    btn.disabled = false;
+    btn.textContent = "Salva ed esci";
+    if(ok) location.hash = "#top";
+  });
+
   function showAdminPanel(){
     document.getElementById("admin-login").hidden = true;
     document.getElementById("admin-body").hidden = false;
     document.getElementById("admin-logout").hidden = false;
+    document.getElementById("admin-save-exit").hidden = false;
     buildContentForm();
     renderAdminCatalogo();
     renderAdminRecensioni();
@@ -2685,6 +2737,7 @@
         document.getElementById("admin-login").hidden = false;
         document.getElementById("admin-body").hidden = true;
         document.getElementById("admin-logout").hidden = true;
+        document.getElementById("admin-save-exit").hidden = true;
       }
     } else {
       overlay.hidden = true;

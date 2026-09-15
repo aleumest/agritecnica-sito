@@ -15,7 +15,7 @@ function verify(token, secret) {
   return true;
 }
 
-const ALLOWED_KEYS = ["content", "contatti", "catalogo", "testimonianze", "dalcampo", "marchi", "tipi", "immagini"];
+const ALLOWED_KEYS = ["content", "contatti", "catalogo", "testimonianze", "dalcampo", "marchi", "tipi", "immagini", "brands"];
 
 module.exports = async (req, res) => {
   if (req.method !== "POST") {
