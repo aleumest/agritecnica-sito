@@ -1,3 +1,9 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="description" content="Agritecnica Sacchetti: vendita, assistenza e ricambi per trattori compatti Antonio Carraro, Kubota e Carraro Tractors a Velletri (RM), dal 1950.">
 <title>Agritecnica Sacchetti</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -183,6 +189,13 @@
     }
     nav.links.open a{ padding-block:10px; border-top:1px solid var(--border); }
     .menu-btn{ display:inline-flex; }
+  }
+  @media (max-width:560px){
+    .nav-cta .btn-primary{ display:none; }
+  }
+  @media (max-width:380px){
+    .nav-cta{ gap:6px; }
+    .cart-btn, .theme-toggle{ width:34px; height:34px; }
   }
 
   /* ---------- hero ---------- */
@@ -621,6 +634,8 @@
   }
   .admin-photo-thumb button:hover{ background:rgba(8,10,5,.9); }
 </style>
+</head>
+<body>
 
 <header class="site">
   <div class="wrap nav-row">
@@ -2160,3 +2175,5 @@
   routeAdmin();
 })();
 </script>
+</body>
+</html>
