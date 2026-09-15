@@ -1168,16 +1168,12 @@
     <div class="admin-login" id="admin-login">
       <form id="admin-login-form" class="admin-login-form">
         <h2>Accesso riservato</h2>
-        <p class="admin-hint">Pannello di amministrazione, bozza. Credenziali provvisorie: da sostituire con un accesso reale prima di pubblicare il sito online.</p>
-        <div class="form-row">
-          <label for="admin-user">Utente</label>
-          <input id="admin-user" type="text" autocomplete="username" required>
-        </div>
+        <p class="admin-hint">Le modifiche fatte da qui sono visibili a chiunque visiti il sito.</p>
         <div class="form-row">
           <label for="admin-pass">Password</label>
           <input id="admin-pass" type="password" autocomplete="current-password" required>
         </div>
-        <p class="admin-error" id="admin-login-error" hidden>Utente o password non corretti.</p>
+        <p class="admin-error" id="admin-login-error" hidden>Password non corretta.</p>
         <button class="btn btn-primary" type="submit">Entra</button>
       </form>
     </div>
@@ -1255,12 +1251,8 @@
       </section>
 
       <section class="admin-panel" id="admin-panel-account" hidden>
-        <h2>Cambia utente e password</h2>
-        <form class="admin-account-form" id="admin-account-form">
-          <div class="form-row"><label for="admin-newuser">Nuovo utente</label><input id="admin-newuser" type="text" autocomplete="username"></div>
-          <div class="form-row"><label for="admin-newpass">Nuova password</label><input id="admin-newpass" type="password" autocomplete="new-password"></div>
-          <button class="btn btn-primary" type="submit">Aggiorna credenziali</button>
-        </form>
+        <h2>Account</h2>
+        <p class="form-note">La password di accesso non è più salvata nel browser: vive come variabile d'ambiente <code>ADMIN_PASSWORD</code> nel progetto Vercel. Per cambiarla vai su Vercel → il progetto → Settings → Environment Variables, modifica <code>ADMIN_PASSWORD</code> e fai un nuovo deploy.</p>
       </section>
     </div>
   </div>
@@ -1350,14 +1342,11 @@
 </div>
 
 <script>
-(function(){
+(async function(){
   "use strict";
 
-  /* ---------- helper localStorage (usati anche dal pannello admin) ---------- */
-  var ADMIN_STORAGE_CONTENT = "agritecnica-content-overrides";
-  var ADMIN_STORAGE_CATALOGO = "agritecnica-catalogo-overrides";
-  var ADMIN_STORAGE_AUTH = "agritecnica-admin-auth";
-  var ADMIN_SESSION_KEY = "agritecnica-admin-session";
+  /* ---------- helper localStorage (per dati legati solo a questo browser: tema, carrello, sessione admin) ---------- */
+  var ADMIN_SESSION_KEY = "agritecnica-admin-token";
   function adminReadJSON(key, fallback){
     try{ var raw = localStorage.getItem(key); return raw ? JSON.parse(raw) : fallback; }catch(e){ return fallback; }
   }
@@ -1365,12 +1354,49 @@
     try{ localStorage.setItem(key, JSON.stringify(value)); return true; }catch(e){ return false; }
   }
 
+  /* ---------- dati condivisi del sito: letti/scritti su Supabase, non più solo nel browser ---------- */
+  var SUPABASE_URL = "https://vcvuudzuftsslhdzdymh.supabase.co";
+  var SUPABASE_ANON_KEY = "sb_publishable_qorOnovk3Nu5UqxMYC4Cmg_Tmhj9efT";
+  var REMOTE = {};
+  var REMOTE_OK = false;
+  try{
+    var remoteRes = await fetch(SUPABASE_URL + "/rest/v1/site_data?select=key,value", {
+      headers: { apikey: SUPABASE_ANON_KEY, Authorization: "Bearer " + SUPABASE_ANON_KEY }
+    });
+    if(remoteRes.ok){
+      var rows = await remoteRes.json();
+      rows.forEach(function(r){ REMOTE[r.key] = r.value; });
+      REMOTE_OK = true;
+    }
+  }catch(e){ /* offline o Supabase non raggiungibile: si resta sui contenuti di base scritti nel file */ }
+
+  function remoteGet(key, fallback){
+    return (key in REMOTE) ? REMOTE[key] : fallback;
+  }
+  function adminToken(){
+    try{ return sessionStorage.getItem(ADMIN_SESSION_KEY); }catch(e){ return null; }
+  }
+  async function remoteSave(key, value){
+    var token = adminToken();
+    if(!token) return false;
+    try{
+      var res = await fetch("/api/save", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ token: token, key: key, value: value })
+      });
+      if(!res.ok) return false;
+      REMOTE[key] = value;
+      return true;
+    }catch(e){ return false; }
+  }
+
   /* campi che contengono markup semplice (<br>, <em>) invece di solo testo */
   var HTML_FIELD_IDS = ["ed-hero-title"];
 
   /* applica testi eventualmente salvati dal pannello admin, anche sul sito pubblico */
   (function applyContentOverrides(){
-    var overrides = adminReadJSON(ADMIN_STORAGE_CONTENT, null);
+    var overrides = remoteGet("content", null);
     if(!overrides) return;
     Object.keys(overrides).forEach(function(id){
       var el = document.getElementById(id);
@@ -1393,7 +1419,7 @@
   var CONTACT = (function(){
     var c = {};
     for(var k in CONTACT_DEFAULT) c[k] = CONTACT_DEFAULT[k];
-    var saved = adminReadJSON(CONTACT_STORAGE, null);
+    var saved = remoteGet("contatti", null);
     if(saved) for(var k2 in saved) c[k2] = saved[k2];
     return c;
   })();
@@ -1417,7 +1443,7 @@
     { key:"band", label:'Fascia "Dal 1950 a Velletri"', type:"bgvar", elId:"ed-band-section", varName:"--band-photo", defaultSrc:"images/fb9-vigneto-grigio.jpg" },
     { key:"cta", label:"Fascia finale di contatto", type:"bgvar", elId:"ed-cta-section", varName:"--cta-photo", defaultSrc:"images/fb7-serra-tc5800f.jpg" }
   ];
-  var IMAGES = adminReadJSON(IMAGES_STORAGE, {});
+  var IMAGES = remoteGet("immagini", {});
   function imageSrcFor(slot){ return IMAGES[slot.key] || slot.defaultSrc; }
   function applyImages(){
     IMAGE_SLOTS.forEach(function(slot){
@@ -1499,7 +1525,7 @@
 
   /* se il pannello admin ha salvato un catalogo modificato, usa quello al posto dei dati di esempio */
   (function applyCatalogoOverride(){
-    var saved = adminReadJSON(ADMIN_STORAGE_CATALOGO, null);
+    var saved = remoteGet("catalogo", null);
     if(saved && saved.length) CATALOGO = saved;
   })();
 
@@ -1551,11 +1577,11 @@
   /* ---------- tipi e marchi del catalogo: gestibili dal pannello admin ---------- */
   var TIPI_STORAGE = "agritecnica-tipi-overrides";
   var TIPI_DEFAULT = [ { value:"trattore", label:"Trattori" }, { value:"rimorchio", label:"Rimorchi" }, { value:"attrezzo", label:"Attrezzature" } ];
-  var TIPI = adminReadJSON(TIPI_STORAGE, null) || TIPI_DEFAULT.slice();
+  var TIPI = remoteGet("tipi", null) || TIPI_DEFAULT.slice();
 
   var MARCHI_STORAGE = "agritecnica-marchi-overrides";
   var MARCHI_DEFAULT = ["Antonio Carraro", "Kubota", "Carraro Tractors", "Officina"];
-  var MARCHI = adminReadJSON(MARCHI_STORAGE, null) || MARCHI_DEFAULT.slice();
+  var MARCHI = remoteGet("marchi", null) || MARCHI_DEFAULT.slice();
 
   var CAT_LABEL = {};
   function rebuildCatLabel(){
@@ -1563,8 +1589,8 @@
     TIPI.forEach(function(t){ CAT_LABEL[t.value] = t.label; });
   }
   rebuildCatLabel();
-  function saveTipi(){ adminWriteJSON(TIPI_STORAGE, TIPI); rebuildCatLabel(); }
-  function saveMarchi(){ adminWriteJSON(MARCHI_STORAGE, MARCHI); }
+  async function saveTipi(){ var ok = await remoteSave("tipi", TIPI); rebuildCatLabel(); return ok; }
+  async function saveMarchi(){ return await remoteSave("marchi", MARCHI); }
   function slugify(label){
     var s = label.toLowerCase().trim().normalize("NFD").replace(/[̀-ͯ]/g, "").replace(/[^a-z0-9]+/g, "-").replace(/(^-|-$)/g, "");
     return s || ("tipo-" + Date.now().toString(36));
@@ -1706,7 +1732,7 @@
     { id:"t2", testo:"Un ricambio urgente in piena raccolta: lo avevano già in magazzino. È quello che chiedi a un'officina di fiducia.", chi:"Cliente storico, settore agricolo" }
   ];
   (function applyTestimonianzeOverride(){
-    var saved = adminReadJSON(ADMIN_STORAGE_TESTIMONIANZE, null);
+    var saved = remoteGet("testimonianze", null);
     if(saved && saved.length) TESTIMONIANZE = saved;
   })();
 
@@ -1728,7 +1754,7 @@
     { id:"dc5", foto:"images/fb8-camion-carraro.jpg", alt:"Bilico Antonio Carraro, il trattore più bello del mondo", caption:'Antonio Carraro, "il trattore più bello del mondo"' }
   ];
   (function applyDalCampoOverride(){
-    var saved = adminReadJSON(ADMIN_STORAGE_DALCAMPO, null);
+    var saved = remoteGet("dalcampo", null);
     if(saved && saved.length) DALCAMPO = saved;
   })();
 
@@ -1936,14 +1962,14 @@
     { group:"Footer", id:"ed-footer-tagline", label:"Frase sotto al logo", long:true }
   ];
 
-  function adminGetAuth(){
-    return adminReadJSON(ADMIN_STORAGE_AUTH, { user:"admin", pass:"agritecnica2026" });
-  }
   function adminIsLoggedIn(){
-    try{ return sessionStorage.getItem(ADMIN_SESSION_KEY) === "1"; }catch(e){ return false; }
+    var token = adminToken();
+    if(!token) return false;
+    var expires = Number(String(token).split(".")[0]);
+    return !!expires && Date.now() < expires;
   }
-  function adminSetLoggedIn(v){
-    try{ if(v) sessionStorage.setItem(ADMIN_SESSION_KEY, "1"); else sessionStorage.removeItem(ADMIN_SESSION_KEY); }catch(e){}
+  function adminSetToken(token){
+    try{ if(token) sessionStorage.setItem(ADMIN_SESSION_KEY, token); else sessionStorage.removeItem(ADMIN_SESSION_KEY); }catch(e){}
   }
 
   var CONTACT_FIELDS = [
@@ -2017,31 +2043,46 @@
     });
   }
 
-  document.getElementById("admin-content-form").addEventListener("submit", function(e){
+  document.getElementById("admin-content-form").addEventListener("submit", async function(e){
     e.preventDefault();
-    var overrides = adminReadJSON(ADMIN_STORAGE_CONTENT, {});
+    var msg = document.getElementById("admin-save-msg");
+    var submitBtn = document.querySelector('#admin-save-row button[type="submit"], .admin-save-row button[type="submit"]');
+    if(submitBtn) submitBtn.disabled = true;
+    var overrides = remoteGet("content", {});
+    var newOverrides = {};
+    for(var k in overrides) newOverrides[k] = overrides[k];
     var inputs = this.querySelectorAll("[data-target-id]");
     inputs.forEach(function(input){
-      var id = input.dataset.targetId;
-      var value = input.value;
-      var target = document.getElementById(id);
-      if(target){ if(input.dataset.html) target.innerHTML = value; else target.textContent = value; }
-      overrides[id] = value;
+      newOverrides[input.dataset.targetId] = input.value;
     });
-    adminWriteJSON(ADMIN_STORAGE_CONTENT, overrides);
+    var newContact = {};
+    for(var k2 in CONTACT) newContact[k2] = CONTACT[k2];
     this.querySelectorAll("[data-contact-key]").forEach(function(input){
-      CONTACT[input.dataset.contactKey] = input.value.trim();
+      newContact[input.dataset.contactKey] = input.value.trim();
     });
-    adminWriteJSON(CONTACT_STORAGE, CONTACT);
-    applyContact();
-    var msg = document.getElementById("admin-save-msg");
-    msg.hidden = false;
-    setTimeout(function(){ msg.hidden = true; }, 2500);
+    var ok1 = await remoteSave("content", newOverrides);
+    var ok2 = await remoteSave("contatti", newContact);
+    if(ok1 && ok2){
+      inputs.forEach(function(input){
+        var id = input.dataset.targetId;
+        var target = document.getElementById(id);
+        if(target){ if(input.dataset.html) target.innerHTML = input.value; else target.textContent = input.value; }
+      });
+      CONTACT = newContact;
+      applyContact();
+      msg.textContent = "Salvato.";
+      msg.hidden = false;
+      setTimeout(function(){ msg.hidden = true; }, 2500);
+    } else {
+      alert("Non sono riuscito a salvare: controlla la connessione e riprova.");
+    }
+    if(submitBtn) submitBtn.disabled = false;
   });
 
-  document.getElementById("admin-reset-testi").addEventListener("click", function(){
+  document.getElementById("admin-reset-testi").addEventListener("click", async function(){
     if(!confirm("Ripristinare tutti i testi predefiniti (compresi i contatti)? Le modifiche salvate andranno perse.")) return;
-    try{ localStorage.removeItem(ADMIN_STORAGE_CONTENT); localStorage.removeItem(CONTACT_STORAGE); }catch(e){}
+    await remoteSave("content", {});
+    await remoteSave("contatti", CONTACT_DEFAULT);
     location.reload();
   });
 
@@ -2067,7 +2108,7 @@
     }).join("");
   }
 
-  document.getElementById("admin-catalogo-list").addEventListener("click", function(e){
+  document.getElementById("admin-catalogo-list").addEventListener("click", async function(e){
     var btn = e.target.closest(".admin-icon-btn");
     if(!btn) return;
     var row = e.target.closest(".admin-row");
@@ -2078,8 +2119,9 @@
       openItemModal(item);
     } else if(btn.dataset.action === "delete"){
       if(confirm('Eliminare "' + item.nome + '" dal catalogo?')){
+        var previous = CATALOGO;
         CATALOGO = CATALOGO.filter(function(it){ return it.id !== id; });
-        adminWriteJSON(ADMIN_STORAGE_CATALOGO, CATALOGO);
+        if(!(await remoteSave("catalogo", CATALOGO))){ CATALOGO = previous; alert("Non sono riuscito a salvare: controlla la connessione e riprova."); return; }
         renderAdminCatalogo();
         render();
       }
@@ -2182,9 +2224,12 @@
   document.getElementById("admin-item-cancel").addEventListener("click", closeItemModal);
   itemBackdrop.addEventListener("click", function(e){ if(e.target === itemBackdrop) closeItemModal(); });
 
-  itemForm.addEventListener("submit", function(e){
+  itemForm.addEventListener("submit", async function(e){
     e.preventDefault();
+    var submitBtn = itemForm.querySelector('button[type="submit"]');
+    submitBtn.disabled = true;
     var id = document.getElementById("ai-id").value;
+    var previous = CATALOGO;
     var data = {
       id: id || ("m-" + Date.now().toString(36)),
       marchio: document.getElementById("ai-marchio").value,
@@ -2203,10 +2248,13 @@
     } else {
       CATALOGO = CATALOGO.concat([data]);
     }
-    if(!adminWriteJSON(ADMIN_STORAGE_CATALOGO, CATALOGO)){
-      alert("Spazio di salvataggio del browser esaurito: prova a usare meno foto o foto più leggere.");
+    if(!(await remoteSave("catalogo", CATALOGO))){
+      CATALOGO = previous;
+      alert("Non sono riuscito a salvare: controlla la connessione (o riprova con foto più leggere) e riprova.");
+      submitBtn.disabled = false;
       return;
     }
+    submitBtn.disabled = false;
     closeItemModal();
     renderAdminCatalogo();
     render();
@@ -2230,7 +2278,7 @@
     }).join("");
   }
 
-  document.getElementById("admin-recensioni-list").addEventListener("click", function(e){
+  document.getElementById("admin-recensioni-list").addEventListener("click", async function(e){
     var btn = e.target.closest(".admin-icon-btn");
     if(!btn) return;
     var row = e.target.closest(".admin-row");
@@ -2241,8 +2289,9 @@
       openTestiModal(t);
     } else if(btn.dataset.action === "delete"){
       if(confirm('Eliminare la recensione di "' + t.chi + '"?')){
+        var previous = TESTIMONIANZE;
         TESTIMONIANZE = TESTIMONIANZE.filter(function(it){ return it.id !== id; });
-        adminWriteJSON(ADMIN_STORAGE_TESTIMONIANZE, TESTIMONIANZE);
+        if(!(await remoteSave("testimonianze", TESTIMONIANZE))){ TESTIMONIANZE = previous; alert("Non sono riuscito a salvare: controlla la connessione e riprova."); return; }
         renderAdminRecensioni();
         renderTestimonianze();
       }
@@ -2263,9 +2312,12 @@
   document.getElementById("admin-testi-cancel").addEventListener("click", closeTestiModal);
   testiBackdrop.addEventListener("click", function(e){ if(e.target === testiBackdrop) closeTestiModal(); });
 
-  document.getElementById("admin-testi-form").addEventListener("submit", function(e){
+  document.getElementById("admin-testi-form").addEventListener("submit", async function(e){
     e.preventDefault();
+    var submitBtn = this.querySelector('button[type="submit"]');
+    submitBtn.disabled = true;
     var id = document.getElementById("at-id").value;
+    var previous = TESTIMONIANZE;
     var data = {
       id: id || ("r-" + Date.now().toString(36)),
       testo: document.getElementById("at-testo").value.trim(),
@@ -2276,7 +2328,13 @@
     } else {
       TESTIMONIANZE = TESTIMONIANZE.concat([data]);
     }
-    adminWriteJSON(ADMIN_STORAGE_TESTIMONIANZE, TESTIMONIANZE);
+    if(!(await remoteSave("testimonianze", TESTIMONIANZE))){
+      TESTIMONIANZE = previous;
+      alert("Non sono riuscito a salvare: controlla la connessione e riprova.");
+      submitBtn.disabled = false;
+      return;
+    }
+    submitBtn.disabled = false;
     closeTestiModal();
     renderAdminRecensioni();
     renderTestimonianze();
@@ -2304,51 +2362,51 @@
     }).join("");
   }
 
-  document.getElementById("admin-marchi-list").addEventListener("click", function(e){
+  document.getElementById("admin-marchi-list").addEventListener("click", async function(e){
     var btn = e.target.closest("[data-remove-marchio]");
     if(!btn) return;
     var i = Number(btn.dataset.removeMarchio);
     if(!confirm('Rimuovere "' + MARCHI[i] + '" dai marchi? I mezzi già salvati con questo marchio non verranno modificati.')) return;
-    MARCHI.splice(i, 1);
-    saveMarchi();
+    var removed = MARCHI.splice(i, 1)[0];
+    if(!(await saveMarchi())){ MARCHI.splice(i, 0, removed); alert("Non sono riuscito a salvare: controlla la connessione e riprova."); return; }
     renderAdminLists();
     populateItemSelects();
     renderFilterChips();
     render();
   });
-  document.getElementById("admin-marchio-add").addEventListener("click", function(){
+  document.getElementById("admin-marchio-add").addEventListener("click", async function(){
     var input = document.getElementById("admin-marchio-new");
     var val = input.value.trim();
     if(!val) return;
     if(MARCHI.indexOf(val) !== -1){ alert("Questo marchio esiste già."); return; }
     MARCHI.push(val);
-    saveMarchi();
+    if(!(await saveMarchi())){ MARCHI.pop(); alert("Non sono riuscito a salvare: controlla la connessione e riprova."); return; }
     input.value = "";
     renderAdminLists();
     populateItemSelects();
     renderFilterChips();
   });
 
-  document.getElementById("admin-tipi-list").addEventListener("click", function(e){
+  document.getElementById("admin-tipi-list").addEventListener("click", async function(e){
     var btn = e.target.closest("[data-remove-tipo]");
     if(!btn) return;
     var i = Number(btn.dataset.removeTipo);
     if(!confirm('Rimuovere "' + TIPI[i].label + '" dai tipi?')) return;
-    TIPI.splice(i, 1);
-    saveTipi();
+    var removed = TIPI.splice(i, 1)[0];
+    if(!(await saveTipi())){ TIPI.splice(i, 0, removed); alert("Non sono riuscito a salvare: controlla la connessione e riprova."); return; }
     renderAdminLists();
     populateItemSelects();
     renderFilterChips();
     render();
   });
-  document.getElementById("admin-tipo-add").addEventListener("click", function(){
+  document.getElementById("admin-tipo-add").addEventListener("click", async function(){
     var input = document.getElementById("admin-tipo-new");
     var label = input.value.trim();
     if(!label) return;
     var value = slugify(label);
     if(TIPI.some(function(t){ return t.value === value; })){ alert("Questo tipo esiste già."); return; }
     TIPI.push({ value:value, label:label });
-    saveTipi();
+    if(!(await saveTipi())){ TIPI.pop(); alert("Non sono riuscito a salvare: controlla la connessione e riprova."); return; }
     input.value = "";
     renderAdminLists();
     populateItemSelects();
@@ -2372,11 +2430,13 @@
       '</div>';
     }).join("");
   }
-  document.getElementById("admin-image-slots").addEventListener("click", function(e){
+  document.getElementById("admin-image-slots").addEventListener("click", async function(e){
     var resetBtn = e.target.closest("[data-slot-reset]");
     if(resetBtn){
-      delete IMAGES[resetBtn.dataset.slotReset];
-      adminWriteJSON(IMAGES_STORAGE, IMAGES);
+      var key = resetBtn.dataset.slotReset;
+      var previous = IMAGES[key];
+      delete IMAGES[key];
+      if(!(await remoteSave("immagini", IMAGES))){ IMAGES[key] = previous; alert("Non sono riuscito a salvare: controlla la connessione e riprova."); return; }
       applyImages();
       renderAdminImages();
     }
@@ -2385,10 +2445,12 @@
     var input = e.target.closest("[data-slot-file]");
     if(!input || !input.files || !input.files[0]) return;
     var key = input.dataset.slotFile;
-    resizeImageFile(input.files[0]).then(function(dataUrl){
+    var previous = IMAGES[key];
+    resizeImageFile(input.files[0]).then(async function(dataUrl){
       IMAGES[key] = dataUrl;
-      if(!adminWriteJSON(IMAGES_STORAGE, IMAGES)){
-        alert("Spazio di salvataggio del browser esaurito: prova con una foto più leggera.");
+      if(!(await remoteSave("immagini", IMAGES))){
+        IMAGES[key] = previous;
+        alert("Non sono riuscito a salvare: controlla la connessione (o prova con una foto più leggera) e riprova.");
         return;
       }
       applyImages();
@@ -2419,7 +2481,7 @@
     }).join("");
   }
 
-  document.getElementById("admin-dalcampo-list").addEventListener("click", function(e){
+  document.getElementById("admin-dalcampo-list").addEventListener("click", async function(e){
     var btn = e.target.closest(".admin-icon-btn");
     if(!btn) return;
     var row = e.target.closest(".admin-row");
@@ -2430,8 +2492,9 @@
       openDcModal(d);
     } else if(btn.dataset.action === "delete"){
       if(confirm('Eliminare la foto "' + d.caption + '"?')){
+        var previous = DALCAMPO;
         DALCAMPO = DALCAMPO.filter(function(it){ return it.id !== id; });
-        adminWriteJSON(ADMIN_STORAGE_DALCAMPO, DALCAMPO);
+        if(!(await remoteSave("dalcampo", DALCAMPO))){ DALCAMPO = previous; alert("Non sono riuscito a salvare: controlla la connessione e riprova."); return; }
         renderAdminDalCampo();
         renderDalCampoPublic();
       }
@@ -2471,10 +2534,13 @@
   document.getElementById("admin-dc-cancel").addEventListener("click", closeDcModal);
   dcBackdrop.addEventListener("click", function(e){ if(e.target === dcBackdrop) closeDcModal(); });
 
-  document.getElementById("admin-dc-form").addEventListener("submit", function(e){
+  document.getElementById("admin-dc-form").addEventListener("submit", async function(e){
     e.preventDefault();
     if(!pendingDcPhoto){ alert("Seleziona una foto."); return; }
+    var submitBtn = this.querySelector('button[type="submit"]');
+    submitBtn.disabled = true;
     var id = document.getElementById("dc-id").value;
+    var previous = DALCAMPO;
     var data = {
       id: id || ("dc-" + Date.now().toString(36)),
       foto: pendingDcPhoto,
@@ -2486,46 +2552,49 @@
     } else {
       DALCAMPO = DALCAMPO.concat([data]);
     }
-    if(!adminWriteJSON(ADMIN_STORAGE_DALCAMPO, DALCAMPO)){
-      alert("Spazio di salvataggio del browser esaurito: prova con una foto più leggera.");
+    if(!(await remoteSave("dalcampo", DALCAMPO))){
+      DALCAMPO = previous;
+      alert("Non sono riuscito a salvare: controlla la connessione (o prova con una foto più leggera) e riprova.");
+      submitBtn.disabled = false;
       return;
     }
+    submitBtn.disabled = false;
     closeDcModal();
     renderAdminDalCampo();
     renderDalCampoPublic();
   });
 
-  document.getElementById("admin-login-form").addEventListener("submit", function(e){
+  document.getElementById("admin-login-form").addEventListener("submit", async function(e){
     e.preventDefault();
-    var auth = adminGetAuth();
-    var u = document.getElementById("admin-user").value.trim();
     var p = document.getElementById("admin-pass").value;
     var err = document.getElementById("admin-login-error");
-    if(u === auth.user && p === auth.pass){
-      err.hidden = true;
-      adminSetLoggedIn(true);
-      showAdminPanel();
-    } else {
+    var submitBtn = this.querySelector('button[type="submit"]');
+    submitBtn.disabled = true;
+    try{
+      var res = await fetch("/api/login", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ password: p })
+      });
+      if(res.ok){
+        var data = await res.json();
+        adminSetToken(data.token);
+        err.hidden = true;
+        showAdminPanel();
+      } else {
+        err.textContent = res.status === 500 ? "Il pannello admin non è ancora configurato online (mancano le variabili d'ambiente su Vercel)." : "Password non corretta.";
+        err.hidden = false;
+      }
+    }catch(ex){
+      err.textContent = "Impossibile contattare il server. Controlla la connessione.";
       err.hidden = false;
     }
+    submitBtn.disabled = false;
   });
 
   document.getElementById("admin-logout").addEventListener("click", function(){
-    adminSetLoggedIn(false);
+    adminSetToken(null);
     location.hash = "#top";
-  });
-
-  document.getElementById("admin-account-form").addEventListener("submit", function(e){
-    e.preventDefault();
-    var newUser = document.getElementById("admin-newuser").value.trim();
-    var newPass = document.getElementById("admin-newpass").value;
-    var auth = adminGetAuth();
-    if(newUser) auth.user = newUser;
-    if(newPass) auth.pass = newPass;
-    adminWriteJSON(ADMIN_STORAGE_AUTH, auth);
-    document.getElementById("admin-newuser").value = "";
-    document.getElementById("admin-newpass").value = "";
-    alert("Credenziali aggiornate.");
   });
 
   function showAdminPanel(){

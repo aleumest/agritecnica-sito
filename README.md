@@ -20,10 +20,32 @@ Redesign del sito di **Agritecnica Sacchetti**, concessionaria di trattori compa
 - Marchi trattati: Antonio Carraro, Kubota, Carraro Tractors
 
 **Ancora finto/segnaposto (da sostituire prima di andare online):**
-- Tutte le foto del sito sono illustrazioni SVG disegnate a mano (nessuna foto reale di trattori, officina, mezzi). Cercare `<svg` nel file per trovarle.
-- Il catalogo (14 trattori/rimorchi/attrezzature) ha modelli e specifiche **inventati ma plausibili**, non il parco macchine reale del cliente.
-- Le 2 recensioni di base sono testo segnaposto.
-- Le credenziali del pannello admin sono provvisorie: utente `admin`, password `agritecnica2026` (cambiabili dalla tab "Account" dentro `#admin`).
+- La maggior parte delle foto sono reali (prese dalla pagina Facebook del cliente), ma alcune sezioni usano ancora illustrazioni SVG disegnate a mano come riempimento. Cercare `<svg` nel file per trovarle.
+- Il catalogo ha alcuni modelli reali (confermati da post Facebook, es. Antonio Carraro Tigre 3800, AF 2.85 B, Major TC 5800 F) ma anche modelli **inventati ma plausibili** per completare la gamma — non è ancora il parco macchine reale e completo del cliente.
+- Alcune recensioni sono ancora testo segnaposto.
+
+## Backend: Supabase + Vercel (login e salvataggio condiviso)
+
+Il pannello admin **non usa più solo `localStorage`**: ora legge e scrive su un database Supabase condiviso, tramite due funzioni serverless in `api/`. Questo significa che una modifica fatta da un browser è visibile a chiunque visiti il sito da qualsiasi altro dispositivo.
+
+**Come funziona:**
+- `index.html` contiene già, in chiaro nel codice, l'URL del progetto Supabase e la chiave **pubblica** (`sb_publishable_...`) — è normale e sicuro: quella chiave è pensata per stare nel browser, permette solo la *lettura* dei dati (vedi le policy RLS in `supabase-setup.sql`).
+- Le *scritture* passano sempre da `api/save.js`, che usa la **service_role key** (segreta) e verifica un token firmato prima di accettare qualsiasi modifica.
+- Il login (`api/login.js`) confronta la password inserita con la variabile d'ambiente `ADMIN_PASSWORD` e restituisce un token firmato con `SESSION_SECRET`, valido 12 ore.
+
+**Variabili d'ambiente da impostare su Vercel** (Project → Settings → Environment Variables), **non vanno mai scritte nel codice**:
+| Nome | Cosa mettere |
+|---|---|
+| `ADMIN_PASSWORD` | La password di accesso al pannello admin (sceglierla il cliente/agenzia) |
+| `SESSION_SECRET` | Una stringa lunga e casuale qualsiasi (es. generata con `openssl rand -hex 32`), usata solo per firmare i token di sessione |
+| `SUPABASE_URL` | `https://vcvuudzuftsslhdzdymh.supabase.co` |
+| `SUPABASE_SERVICE_ROLE_KEY` | La chiave "service_role" da Supabase → Project Settings → API (quella segreta, **mai** quella pubblica) |
+
+Dopo averle aggiunte serve un **nuovo deploy** su Vercel perché le funzioni le leggano (un redeploy manuale, o un nuovo `git push`).
+
+**Prima ancora di tutto questo**, va eseguito **una sola volta** lo script `supabase-setup.sql` nell'SQL Editor di Supabase (crea la tabella `site_data` e le policy di sicurezza). Se manca, il sito continua a funzionare mostrando solo i contenuti di base scritti nel file (fallback automatico), ma il pannello admin non riuscirà a salvare nulla.
+
+**Testare in locale:** `npx serve .` fa funzionare la lettura da Supabase (chiamata diretta dal browser), ma **non** le funzioni in `api/` (login e salvataggio), perché quelle girano solo su Vercel (o con `vercel dev`, se installato). È normale vedere "Password non corretta" tentando il login in locale: va testato dopo il deploy su Vercel.
 
 ## Come lavorarci
 
@@ -44,7 +66,7 @@ C'è un pannello di amministrazione raggiungibile da `#admin` (link "Area riserv
 - aggiungere/modificare/eliminare recensioni
 - modificare quasi tutti i testi del sito (titoli, descrizioni, FAQ, ecc.)
 
-**Attenzione:** è tutto salvato nel `localStorage` del browser di chi lo usa. Non c'è un backend, non c'è un database, non è condiviso tra dispositivi o visitatori. Se il cliente modifica qualcosa da un browser, un visitatore che apre il sito da un altro dispositivo NON vede quella modifica. È un prototipo funzionante dell'esperienza d'uso, non ancora la cosa vera. Prima di lanciare il sito con questa funzionalità va costruito un backend reale (vedi sezione "Prossimi passi" più sotto).
+Le modifiche sono salvate su Supabase (vedi sezione "Backend" più sopra) e visibili a tutti i visitatori — non serve più localStorage per questo. Il carrello richieste dei visitatori resta invece locale al browser (giusto così: non è contenuto del sito, è una scelta personale di chi naviga).
 
 ## Mettere online il sito (dominio già esistente)
 
@@ -94,7 +116,7 @@ Non serve nessun `vercel.json` per un sito a pagina singola come questo (il `ver
 Questi non sono ancora stati fatti, da valutare quando il cliente è pronto a investire in un vero backend (stesso livello del sito AVMECH):
 
 - **Form di contatto reale**: oggi il form apre semplicemente il client email (`mailto:`) via JavaScript, perché non c'è backend. Per un invio vero servirebbe una funzione serverless (es. `api/contatti.ts` su Vercel, come fa `AVMECH SITO FULL/AVMECH SITO/api/chat.ts`) collegata a un servizio email (Resend, SendGrid, ecc.).
-- **Pannello admin reale**: oggi scrive solo nel `localStorage` del browser (vedi sopra). Per renderlo vero servono: un database (Postgres/Vercel KV/Supabase), delle API serverless per leggere/scrivere catalogo, testi e recensioni, e un login vero (non username/password in chiaro nel JS). L'architettura di AVMECH (`api/admin`) è un buon punto di partenza da guardare.
+- **Pannello admin**: fatto (Supabase + `api/login.js` + `api/save.js`, vedi sezione "Backend" sopra). Eventuale prossimo miglioramento: spostare le foto caricate dal pannello (oggi base64 dentro il JSON) su Supabase Storage, per righe più leggere.
 - **Foto vere**: chiedere al cliente foto reali di officina, mezzi in vendita, magazzino ricambi.
 - **Recensioni vere**: sostituire quelle segnaposto con recensioni reali (magari prese da Google/Facebook, con permesso del cliente).
 
