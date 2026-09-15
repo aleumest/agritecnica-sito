@@ -31,7 +31,9 @@ Il pannello admin **non usa più solo `localStorage`**: ora legge e scrive su un
 **Come funziona:**
 - `index.html` contiene già, in chiaro nel codice, l'URL del progetto Supabase e la chiave **pubblica** (`sb_publishable_...`) — è normale e sicuro: quella chiave è pensata per stare nel browser, permette solo la *lettura* dei dati (vedi le policy RLS in `supabase-setup.sql`).
 - Le *scritture* passano sempre da `api/save.js`, che usa la **service_role key** (segreta) e verifica un token firmato prima di accettare qualsiasi modifica.
-- Il login (`api/login.js`) confronta la password inserita con la variabile d'ambiente `ADMIN_PASSWORD` e restituisce un token firmato con `SESSION_SECRET`, valido 12 ore.
+- Il login (`api/login.js`) confronta la password inserita con quella salvata e restituisce un token firmato con `SESSION_SECRET`, valido 12 ore.
+
+**Password admin cambiabile dal pannello, senza toccare Vercel:** la password non vive più (solo) nella variabile d'ambiente `ADMIN_PASSWORD`. C'è una tabella privata `admin_auth` su Supabase (creata da `supabase-setup.sql`, **senza nessuna policy pubblica** — quindi invisibile a chiunque non abbia la service_role key) che può contenere una password sostitutiva, salvata come hash+salt (`crypto.scryptSync`, mai in chiaro). Dal tab "Account" del pannello admin, chi è già loggato può cambiarla inserendo quella attuale + la nuova: da quel momento il login controlla prima questa tabella, e solo se non è mai stata impostata usa ancora `ADMIN_PASSWORD` come prima. Così il proprietario del sito può cambiare la password quando vuole senza sapere/toccare le variabili d'ambiente su Vercel (che restano dell'agenzia).
 
 **Variabili d'ambiente da impostare su Vercel** (Project → Settings → Environment Variables), **non vanno mai scritte nel codice**:
 | Nome | Cosa mettere |
@@ -43,7 +45,7 @@ Il pannello admin **non usa più solo `localStorage`**: ora legge e scrive su un
 
 Dopo averle aggiunte serve un **nuovo deploy** su Vercel perché le funzioni le leggano (un redeploy manuale, o un nuovo `git push`).
 
-**Prima ancora di tutto questo**, va eseguito **una sola volta** lo script `supabase-setup.sql` nell'SQL Editor di Supabase (crea la tabella `site_data` e le policy di sicurezza). Se manca, il sito continua a funzionare mostrando solo i contenuti di base scritti nel file (fallback automatico), ma il pannello admin non riuscirà a salvare nulla.
+**Prima ancora di tutto questo**, va eseguito **una sola volta** lo script `supabase-setup.sql` nell'SQL Editor di Supabase (crea le tabelle `site_data` e `admin_auth` e le policy di sicurezza — se il progetto Supabase è stato creato prima di questa funzione, va rieseguito per aggiungere `admin_auth`). Se manca, il sito continua a funzionare mostrando solo i contenuti di base scritti nel file (fallback automatico), ma il pannello admin non riuscirà a salvare nulla.
 
 **Testare in locale:** `npx serve .` fa funzionare la lettura da Supabase (chiamata diretta dal browser), ma **non** le funzioni in `api/` (login e salvataggio), perché quelle girano solo su Vercel (o con `vercel dev`, se installato). È normale vedere "Password non corretta" tentando il login in locale: va testato dopo il deploy su Vercel.
 

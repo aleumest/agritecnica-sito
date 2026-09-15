@@ -21,3 +21,17 @@ create policy "Public read access"
 -- Le uniche scritture arrivano dalle funzioni server (/api/save), che usano la
 -- "service_role key" (segreta, mai esposta al browser) e quindi bypassano le
 -- regole RLS di riga — così solo chi conosce la password admin può salvare.
+
+-- Tabella separata per la password dell'admin: NON ha nessuna policy pubblica
+-- (né lettura né scrittura), quindi resta invisibile a chiunque visiti il sito.
+-- Solo le funzioni server (/api/login, /api/change-password), che usano la
+-- service_role key, riescono a leggerla/scriverla: bypassano sempre le RLS.
+create table if not exists admin_auth (
+  id text primary key,
+  pass_hash text not null,
+  pass_salt text not null,
+  updated_at timestamptz not null default now()
+);
+alter table admin_auth enable row level security;
+-- Nessuna policy creata qui apposta: senza policy, RLS blocca TUTTI gli accessi
+-- tramite la chiave pubblica. Solo la service_role key (server) può leggerla/scriverla.

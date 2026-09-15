@@ -1138,6 +1138,7 @@
       <span id="ed-copyright">© 2026 Agritecnica di Sacchetti Carlo e Fabio S.n.c. · dal 1950</span>
       <span data-contact-text="orari">Lun-Ven 8:00-13:00 e 15:30-19:00 · Sab 8:00-13:00</span>
       <span id="ed-credit">Sito realizzato da GAMA</span>
+      <a href="mailto:gamasites.info@gmail.com" id="ed-gama-email" style="margin-left:8px;">gamasites.info@gmail.com</a>
     </div>
   </div>
 </footer>
@@ -1249,7 +1250,26 @@
 
       <section class="admin-panel" id="admin-panel-account" hidden>
         <h2>Account</h2>
-        <p class="form-note">La password di accesso non è più salvata nel browser: vive come variabile d'ambiente <code>ADMIN_PASSWORD</code> nel progetto Vercel. Per cambiarla vai su Vercel → il progetto → Settings → Environment Variables, modifica <code>ADMIN_PASSWORD</code> e fai un nuovo deploy.</p>
+        <p class="form-note">Cambia qui la password di accesso al pannello. Non serve Vercel: la nuova password viene salvata subito ed è valida dal prossimo accesso.</p>
+        <form id="admin-password-form" style="max-width:420px;">
+          <div class="form-row">
+            <label for="admin-pass-old">Password attuale</label>
+            <input id="admin-pass-old" type="password" autocomplete="current-password" required>
+          </div>
+          <div class="form-row">
+            <label for="admin-pass-new">Nuova password</label>
+            <input id="admin-pass-new" type="password" autocomplete="new-password" minlength="6" required>
+          </div>
+          <div class="form-row">
+            <label for="admin-pass-new2">Ripeti nuova password</label>
+            <input id="admin-pass-new2" type="password" autocomplete="new-password" minlength="6" required>
+          </div>
+          <p class="admin-error" id="admin-password-error" hidden></p>
+          <div class="admin-save-row">
+            <button class="btn btn-primary" type="submit">Cambia password</button>
+            <span class="admin-save-msg" id="admin-password-msg" hidden>Password aggiornata.</span>
+          </div>
+        </form>
       </section>
     </div>
   </div>
@@ -2690,6 +2710,50 @@
   document.getElementById("admin-logout").addEventListener("click", function(){
     adminSetToken(null);
     location.hash = "#top";
+  });
+
+  document.getElementById("admin-password-form").addEventListener("submit", async function(e){
+    e.preventDefault();
+    var errEl = document.getElementById("admin-password-error");
+    var msgEl = document.getElementById("admin-password-msg");
+    errEl.hidden = true;
+    msgEl.hidden = true;
+    var oldPassword = document.getElementById("admin-pass-old").value;
+    var newPassword = document.getElementById("admin-pass-new").value;
+    var newPassword2 = document.getElementById("admin-pass-new2").value;
+    if(newPassword.length < 6){
+      errEl.textContent = "La nuova password deve avere almeno 6 caratteri.";
+      errEl.hidden = false;
+      return;
+    }
+    if(newPassword !== newPassword2){
+      errEl.textContent = "Le due password non coincidono.";
+      errEl.hidden = false;
+      return;
+    }
+    var submitBtn = this.querySelector('button[type="submit"]');
+    submitBtn.disabled = true;
+    try {
+      var resp = await fetch("/api/change-password", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ token: adminToken(), oldPassword: oldPassword, newPassword: newPassword })
+      });
+      var data = await resp.json().catch(function(){ return {}; });
+      if(resp.ok && data.ok){
+        this.reset();
+        msgEl.textContent = "Password aggiornata.";
+        msgEl.hidden = false;
+        setTimeout(function(){ msgEl.hidden = true; }, 3000);
+      } else {
+        errEl.textContent = data.error || "Non sono riuscito a cambiare la password.";
+        errEl.hidden = false;
+      }
+    } catch(err){
+      errEl.textContent = "Impossibile contattare il server. Controlla la connessione.";
+      errEl.hidden = false;
+    }
+    submitBtn.disabled = false;
   });
 
   document.getElementById("admin-save-exit").addEventListener("click", async function(){
